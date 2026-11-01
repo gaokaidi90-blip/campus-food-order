@@ -1,0 +1,41 @@
+/**
+ * 食堂数据
+ */
+export const canteens = [
+    {
+        id: '1',
+        name: '第一食堂',
+        description: '提供中式快餐，物美价廉',
+        image: 'https://via.placeholder.com/400x200',
+        address: '教学楼A区1楼',
+        openTime: '07:00',
+        closeTime: '20:00',
+        status: 1,
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+    },
+    {
+        id: '2',
+        name: '第二食堂',
+        description: '特色美食，品种丰富',
+        image: 'https://via.placeholder.com/400x200',
+        address: '教学楼B区2楼',
+        openTime: '07:30',
+        closeTime: '21:00',
+        status: 1,
+        createdAt: '2024-01-02T00:00:00.000Z',
+        updatedAt: '2024-01-02T00:00:00.000Z',
+    },
+    {
+        id: '3',
+        name: '清真食堂',
+        description: '清真美食专供',
+        image: 'https://via.placeholder.com/400x200',
+        address: '教学楼C区1楼',
+        openTime: '08:00',
+        closeTime: '19:00',
+        status: 1,
+        createdAt: '2024-01-03T00:00:00.000Z',
+        updatedAt: '2024-01-03T00:00:00.000Z',
+    },
+];
