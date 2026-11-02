@@ -17,6 +17,18 @@ const router = createRouter({
       component: () => import('@/views/home/index.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/canteen/:id',
+      name: 'canteen-detail',
+      component: () => import('@/views/canteen/[id].vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/dish/:id',
+      name: 'dish-detail',
+      component: () => import('@/views/dish/[id].vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 
