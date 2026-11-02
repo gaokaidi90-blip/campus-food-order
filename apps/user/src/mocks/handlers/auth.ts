@@ -4,12 +4,15 @@ import { users, userPasswords } from '../data/users'
 
 /**
  * 验证用户 token
+ * @param request 请求对象
+ * @returns 返回 token 字符串，验证失败返回 null
  */
 function validateUserToken(request: Request): string | null {
   const authHeader = request.headers.get('Authorization')
   if (!authHeader?.startsWith('Bearer ')) return null
 
   const token = authHeader.substring(7)
+  // 用户 token 格式：user_token_{userId}_{timestamp}
   if (!token.startsWith('user_token_')) return null
 
   return token
@@ -20,8 +23,10 @@ export const authHandlers = [
   http.post('/api/user/login', async ({ request }) => {
     const body = (await request.json()) as UserLoginReq
 
+    // 查找用户
     const user = users.find((u) => u.studentId === body.studentId)
 
+    // 验证学号和密码
     if (!user || userPasswords[body.studentId] !== body.password) {
       return HttpResponse.json(
         {
@@ -33,6 +38,7 @@ export const authHandlers = [
       )
     }
 
+    // 生成 token（格式：user_token_{userId}_{timestamp}）
     const token = `user_token_${user.id}_${Date.now()}`
 
     return HttpResponse.json({
@@ -60,7 +66,7 @@ export const authHandlers = [
       )
     }
 
-    // 从 token 中提取用户 ID
+    // 从 token 中提取用户 ID（格式：user_token_{userId}_{timestamp}）
     const userId = token.split('_')[2]
     const user = users.find((u) => u.id === userId)
 

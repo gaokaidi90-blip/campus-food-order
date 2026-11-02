@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { Dish } from '@campus-food/shared'
 import { getDishDetail } from '@/api'
+import { useCart } from '@/composables/useCart'
 import { showToast } from 'vant'
 
 const route = useRoute()
 const router = useRouter()
+const { addToCart } = useCart()
 
 const loading = ref(false)
 const dish = ref<Dish | null>(null)
@@ -24,9 +26,16 @@ async function fetchDishDetail() {
   }
 }
 
-function handleAddToCart() {
-  showToast('加入购物车成功')
-  router.back()
+/**
+ * 加入购物车
+ */
+async function handleAddToCart() {
+  if (!dish.value) return
+
+  const success = await addToCart(dish.value.id, quantity.value)
+  if (success) {
+    router.back()
+  }
 }
 
 onMounted(() => {
