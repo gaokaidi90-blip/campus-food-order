@@ -4,9 +4,25 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-const app = createApp(App)
+/**
+ * 启动 MSW (Mock Service Worker)
+ * 仅在开发环境启用，用于模拟后端 API
+ */
+async function enableMocking() {
+  if (import.meta.env.MODE === 'development') {
+    const { worker } = await import('./mocks')
+    console.log('[Admin MSW] Starting worker...')
+    return worker.start({
+      onUnhandledRequest: 'warn', // 未匹配的请求显示警告
+    })
+  }
+}
 
-app.use(createPinia())
-app.use(router)
+enableMocking().then(() => {
+  const app = createApp(App)
 
-app.mount('#app')
+  app.use(createPinia())
+  app.use(router)
+
+  app.mount('#app')
+})

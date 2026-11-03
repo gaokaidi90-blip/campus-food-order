@@ -1,0 +1,5 @@
+import { setupWorker } from 'msw/browser'
+import { handlers } from './handlers'
+
+console.log('[Admin MSW] Registering handlers:', handlers.length)
+export const worker = setupWorker(...handlers)
