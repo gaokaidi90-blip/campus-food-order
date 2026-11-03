@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { getStorage } from '@/utils/storage'
 import { TOKEN_KEY } from '@campus-food/shared'
 
+// 路由配置
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -69,24 +70,22 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to, _from) => {
   const token = getStorage<string>(TOKEN_KEY)
   const requiresAuth = to.meta.requiresAuth !== false
 
   // 已登录访问登录页，跳转到首页
   if (to.path === '/login' && token) {
-    next('/')
-    return
+    return '/'
   }
 
   // 需要登录但未登录，跳转到登录页
   if (requiresAuth && !token) {
-    next('/login')
-    return
+    return '/login'
   }
 
   // 其他情况放行
-  next()
+  return true
 })
 
 export default router
