@@ -7,7 +7,13 @@
       "Bash(git commit -m 'feat: 初始化 pnpm workspace 结构:*)",
       "Bash(git commit -m 'feat\\(shared\\): 创建 shared 公共包:*)",
       "Bash(git commit -m 'feat\\(user\\): 初始化 user app 基础架构:*)",
-      "Bash(git commit -m 'feat\\(user\\): 实现认证流程:*)"
+      "Bash(git commit -m 'feat\\(user\\): 实现认证流程:*)",
+      "Bash(taskkill:*)",
+      "Bash(pkill:*)",
+      "Bash(ls:*)",
+      "Bash(netstat -ano)",
+      "Bash(findstr \":3000\")",
+      "Bash(findstr \"LISTENING\")"
     ]
   }
 }

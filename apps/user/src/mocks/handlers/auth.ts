@@ -3,6 +3,28 @@ import type { Res, UserLoginReq, UserLoginRes } from '@campus-food/shared'
 import { users, userPasswords } from '../data/users'
 
 /**
+ * 管理员账号数据（用于统一登录页）
+ */
+const admins = [
+  {
+    id: '1',
+    username: 'admin',
+    password: 'admin123',
+    name: '系统管理员',
+    phone: '13800138000',
+    role: 'admin',
+  },
+  {
+    id: '2',
+    username: 'canteen_admin',
+    password: 'admin123',
+    name: '食堂管理员',
+    phone: '13800138001',
+    role: 'admin',
+  },
+]
+
+/**
  * 验证用户 token
  * @param request 请求对象
  * @returns 返回 token 字符串，验证失败返回 null
@@ -47,6 +69,48 @@ export const authHandlers = [
       data: {
         token,
         user,
+      },
+    })
+  }),
+
+  /**
+   * 管理员登录（用于统一登录页）
+   * 验证用户名和密码，返回 admin token
+   */
+  http.post('/api/admin/login', async ({ request }) => {
+    const body = (await request.json()) as { username: string; password: string }
+
+    // 查找管理员账号
+    const admin = admins.find(
+      (a) => a.username === body.username && a.password === body.password
+    )
+
+    if (!admin) {
+      return HttpResponse.json<Res<null>>(
+        {
+          code: 401,
+          message: '用户名或密码错误',
+          data: null,
+        },
+        { status: 401 }
+      )
+    }
+
+    // 生成管理员 token (格式: admin_token_{adminId}_{timestamp})
+    const token = `admin_token_${admin.id}_${Date.now()}`
+
+    return HttpResponse.json<Res<{ token: string; admin: Omit<typeof admin, 'password'> }>>({
+      code: 200,
+      message: 'success',
+      data: {
+        token,
+        admin: {
+          id: admin.id,
+          username: admin.username,
+          name: admin.name,
+          phone: admin.phone,
+          role: admin.role,
+        },
       },
     })
   }),

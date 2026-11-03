@@ -1,28 +1,50 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import { useAuth } from '@/composables/useAuth'
+import { adminLogin } from '@/api'
+import { setStorage } from '@/utils/storage'
+import { ADMIN_TOKEN_KEY } from '@campus-food/shared'
 
 const router = useRouter()
+const route = useRoute()
 const { login } = useAuth()
 
-const studentId = ref('')
-const password = ref('')
+/**
+ * 登录类型：user（学生）或 admin（管理员）
+ */
+const loginType = ref<'user' | 'admin'>('user')
+
+// 学生登录表单
+const studentForm = ref({
+  studentId: '',
+  password: '',
+})
+
+// 管理员登录表单
+const adminForm = ref({
+  username: '',
+  password: '',
+})
+
 const loading = ref(false)
 
-async function handleLogin() {
-  if (!studentId.value) {
+/**
+ * 处理学生登录
+ */
+async function handleUserLogin() {
+  if (!studentForm.value.studentId) {
     showToast('请输入学号')
     return
   }
-  if (!password.value) {
+  if (!studentForm.value.password) {
     showToast('请输入密码')
     return
   }
 
   loading.value = true
-  const success = await login(studentId.value, password.value)
+  const success = await login(studentForm.value.studentId, studentForm.value.password)
   loading.value = false
 
   if (success) {
@@ -32,26 +54,92 @@ async function handleLogin() {
     showToast('学号或密码错误')
   }
 }
+
+/**
+ * 处理管理员登录
+ */
+async function handleAdminLogin() {
+  if (!adminForm.value.username) {
+    showToast('请输入用户名')
+    return
+  }
+  if (!adminForm.value.password) {
+    showToast('请输入密码')
+    return
+  }
+
+  loading.value = true
+  try {
+    // 调用管理员登录 API
+    const { data } = await adminLogin({
+      username: adminForm.value.username,
+      password: adminForm.value.password,
+    })
+
+    // 保存管理员 token
+    setStorage(ADMIN_TOKEN_KEY, data.data.token)
+
+    showToast('登录成功')
+
+    // 跳转到管理后台
+    setTimeout(() => {
+      window.location.href = 'http://localhost:3001/dashboard'
+    }, 500)
+  } catch (error) {
+    showToast('用户名或密码错误')
+  } finally {
+    loading.value = false
+  }
+}
+
+/**
+ * 提交登录表单
+ */
+function handleLogin() {
+  if (loginType.value === 'user') {
+    handleUserLogin()
+  } else {
+    handleAdminLogin()
+  }
+}
+
+/**
+ * 检查 URL 参数，自动切换到管理员登录
+ */
+onMounted(() => {
+  if (route.query.redirect === 'admin') {
+    loginType.value = 'admin'
+  }
+})
 </script>
 
 <template>
   <div class="login-container">
     <div class="login-header">
       <h1>校园点餐</h1>
-      <p>欢迎使用学生点餐系统</p>
+      <p>{{ loginType === 'user' ? '欢迎使用学生点餐系统' : '管理后台登录' }}</p>
     </div>
 
-    <van-form @submit="handleLogin">
+    <!-- 角色切换 Tab -->
+    <div class="login-tabs">
+      <van-tabs v-model:active="loginType" shrink>
+        <van-tab title="学生登录" name="user" />
+        <van-tab title="管理员登录" name="admin" />
+      </van-tabs>
+    </div>
+
+    <!-- 学生登录表单 -->
+    <van-form v-if="loginType === 'user'" @submit="handleLogin">
       <van-cell-group inset>
         <van-field
-          v-model="studentId"
+          v-model="studentForm.studentId"
           name="studentId"
           label="学号"
           placeholder="请输入学号"
           :rules="[{ required: true, message: '请输入学号' }]"
         />
         <van-field
-          v-model="password"
+          v-model="studentForm.password"
           type="password"
           name="password"
           label="密码"
@@ -71,12 +159,50 @@ async function handleLogin() {
           登录
         </van-button>
       </div>
+
+      <div class="login-tip">
+        <p>测试账号：2021001</p>
+        <p>测试密码：password123</p>
+      </div>
     </van-form>
 
-    <div class="login-tip">
-      <p>测试账号：2021001</p>
-      <p>测试密码：password123</p>
-    </div>
+    <!-- 管理员登录表单 -->
+    <van-form v-else @submit="handleLogin">
+      <van-cell-group inset>
+        <van-field
+          v-model="adminForm.username"
+          name="username"
+          label="用户名"
+          placeholder="请输入用户名"
+          :rules="[{ required: true, message: '请输入用户名' }]"
+        />
+        <van-field
+          v-model="adminForm.password"
+          type="password"
+          name="password"
+          label="密码"
+          placeholder="请输入密码"
+          :rules="[{ required: true, message: '请输入密码' }]"
+        />
+      </van-cell-group>
+
+      <div class="login-button">
+        <van-button
+          round
+          block
+          type="primary"
+          native-type="submit"
+          :loading="loading"
+        >
+          登录
+        </van-button>
+      </div>
+
+      <div class="login-tip">
+        <p>测试账号：admin</p>
+        <p>测试密码：admin123</p>
+      </div>
+    </van-form>
   </div>
 </template>
 
@@ -89,7 +215,7 @@ async function handleLogin() {
 
 .login-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
   color: #fff;
 
   h1 {
@@ -101,6 +227,28 @@ async function handleLogin() {
   p {
     font-size: 14px;
     opacity: 0.9;
+  }
+}
+
+.login-tabs {
+  margin-bottom: 20px;
+
+  :deep(.van-tabs__nav) {
+    background: transparent;
+  }
+
+  :deep(.van-tab) {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+  }
+
+  :deep(.van-tab--active) {
+    color: #fff;
+    font-weight: bold;
+  }
+
+  :deep(.van-tabs__line) {
+    background-color: #fff;
   }
 }
 

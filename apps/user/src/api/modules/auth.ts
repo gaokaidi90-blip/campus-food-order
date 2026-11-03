@@ -1,4 +1,4 @@
-import type { User, UserLoginReq, UserLoginRes } from '@campus-food/shared'
+import type { User, UserLoginReq, UserLoginRes, Admin } from '@campus-food/shared'
 import { post, get } from '@/utils/request'
 
 /**
@@ -6,6 +6,13 @@ import { post, get } from '@/utils/request'
  */
 export function login(data: UserLoginReq) {
   return post<UserLoginRes>('/user/login', data)
+}
+
+/**
+ * 管理员登录
+ */
+export function adminLogin(data: { username: string; password: string }) {
+  return post<{ token: string; admin: Omit<Admin, 'password'> }>('/admin/login', data)
 }
 
 /**
