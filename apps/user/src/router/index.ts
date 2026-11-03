@@ -35,6 +35,18 @@ const router = createRouter({
       component: () => import('@/views/cart/index.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/address',
+      name: 'address-list',
+      component: () => import('@/views/address/index.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/address/edit',
+      name: 'address-edit',
+      component: () => import('@/views/address/edit.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 
