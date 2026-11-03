@@ -4,4 +4,6 @@ export * from './modules/dish'
 export * from './modules/cart'
 export * from './modules/address'
 export * from './modules/order'
+export * from './modules/profile'
+
 

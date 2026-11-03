@@ -64,6 +64,18 @@ const routes = [
       component: () => import('@/views/checkout/index.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/views/profile/index.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/404.vue'),
+      meta: { requiresAuth: false },
+    },
 ]
 
 console.log('[Router] Total routes:', routes.length)
