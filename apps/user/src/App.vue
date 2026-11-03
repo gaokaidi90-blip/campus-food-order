@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import 'vant/lib/index.css'
 import '@/assets/styles/reset.less'
 import '@/assets/styles/variables.less'
 </script>

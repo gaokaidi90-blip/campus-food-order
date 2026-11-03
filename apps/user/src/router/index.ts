@@ -73,15 +73,20 @@ router.beforeEach((to, _from, next) => {
   const token = getStorage<string>(TOKEN_KEY)
   const requiresAuth = to.meta.requiresAuth !== false
 
-  if (requiresAuth && !token) {
-    // 需要登录但未登录，跳转到登录页
-    next('/login')
-  } else if (to.path === '/login' && token) {
-    // 已登录访问登录页，跳转到首页
+  // 已登录访问登录页，跳转到首页
+  if (to.path === '/login' && token) {
     next('/')
-  } else {
-    next()
+    return
   }
+
+  // 需要登录但未登录，跳转到登录页
+  if (requiresAuth && !token) {
+    next('/login')
+    return
+  }
+
+  // 其他情况放行
+  next()
 })
 
 export default router
