@@ -3,9 +3,7 @@ import { getStorage } from '@/utils/storage'
 import { TOKEN_KEY } from '@campus-food/shared'
 
 // 路由配置
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+const routes = [
     {
       path: '/login',
       name: 'login',
@@ -66,7 +64,14 @@ const router = createRouter({
       component: () => import('@/views/checkout/index.vue'),
       meta: { requiresAuth: true },
     },
-  ],
+]
+
+console.log('[Router] Total routes:', routes.length)
+console.log('[Router] Route paths:', routes.map(r => r.path))
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
 })
 
 // 路由守卫

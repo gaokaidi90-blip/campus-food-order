@@ -37,12 +37,7 @@ onMounted(() => {
     <div class="content">
       <van-pull-refresh v-model="loading" @refresh="fetchCanteens">
         <div class="canteen-list">
-          <div
-            v-for="canteen in canteens"
-            :key="canteen.id"
-            class="canteen-item"
-            @click="handleCanteenClick(canteen)"
-          >
+          <div v-for="canteen in canteens" :key="canteen.id" class="canteen-item" @click="handleCanteenClick(canteen)">
             <van-image :src="canteen.image" fit="cover" class="canteen-image" />
             <div class="canteen-info">
               <div class="canteen-name">{{ canteen.name }}</div>
@@ -146,4 +141,3 @@ onMounted(() => {
   margin-left: 8px;
 }
 </style>
-
