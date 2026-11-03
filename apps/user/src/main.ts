@@ -10,8 +10,9 @@ import router from './router'
 async function enableMocking() {
   if (import.meta.env.MODE === 'development') {
     const { worker } = await import('./mocks')
-    await worker.start({
-      onUnhandledRequest: 'bypass',
+    console.log('[MSW] Starting worker...')
+    return worker.start({
+      onUnhandledRequest: 'warn',
     })
   }
 }
