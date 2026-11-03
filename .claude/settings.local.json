@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm approve-builds:*)",
+      "Bash(pnpm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m 'feat: 初始化 pnpm workspace 结构:*)",
+      "Bash(git commit -m 'feat\\(shared\\): 创建 shared 公共包:*)",
+      "Bash(git commit -m 'feat\\(user\\): 初始化 user app 基础架构:*)",
+      "Bash(git commit -m 'feat\\(user\\): 实现认证流程:*)"
+    ]
+  }
+}

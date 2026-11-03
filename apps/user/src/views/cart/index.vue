@@ -3,11 +3,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import { useCart } from '@/composables/useCart'
+import { useOrder } from '@/composables/useOrder'
 import { showToast, showConfirmDialog } from 'vant'
 
 const router = useRouter()
 const cartStore = useCartStore()
 const { updateCartItem, removeCartItem } = useCart()
+const { createOrder } = useOrder()
 
 const loading = ref(false)
 const checkedIds = ref<string[]>([])
@@ -87,14 +89,31 @@ async function handleDelete(id: string) {
 /**
  * 结算
  */
-function handleCheckout() {
+async function handleCheckout() {
   if (checkedCount.value === 0) {
     showToast('请选择要结算的商品')
     return
   }
 
-  // TODO: 跳转到结算页面
-  showToast('结算功能待实现')
+  // 获取选中的购物车项
+  const selectedItems = cartStore.cartItems.filter((item) =>
+    checkedIds.value.includes(item.id)
+  )
+
+  // 检查是否来自同一食堂
+  const canteenIds = [...new Set(selectedItems.map((item) => item.canteenId))]
+  if (canteenIds.length > 1) {
+    showToast('只能选择同一食堂的菜品')
+    return
+  }
+
+  // 跳转到结算页面
+  router.push({
+    path: '/checkout',
+    query: {
+      items: checkedIds.value.join(','),
+    },
+  })
 }
 
 onMounted(() => {

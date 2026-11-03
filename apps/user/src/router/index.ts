@@ -47,6 +47,24 @@ const router = createRouter({
       component: () => import('@/views/address/edit.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/order',
+      name: 'order-list',
+      component: () => import('@/views/order/index.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/order/:id',
+      name: 'order-detail',
+      component: () => import('@/views/order/[id].vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('@/views/checkout/index.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 
