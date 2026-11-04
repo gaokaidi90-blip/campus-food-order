@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import type { UploadProps } from 'element-plus'
 
@@ -73,9 +72,12 @@ const handleChange: UploadProps['onChange'] = (uploadFile) => {
       accept="image/*"
     >
       <img v-if="imageUrl" :src="imageUrl" class="uploaded-image" />
-      <el-icon v-else class="upload-icon">
-        <Plus />
-      </el-icon>
+      <div v-else class="upload-placeholder">
+        <el-icon class="upload-icon">
+          <i-ep-plus />
+        </el-icon>
+        <div class="upload-text">点击上传图片</div>
+      </div>
     </el-upload>
     <div class="upload-tip">支持 jpg、png、gif 格式，大小不超过 2MB</div>
   </div>
@@ -103,9 +105,22 @@ const handleChange: UploadProps['onChange'] = (uploadFile) => {
     }
   }
 
+  .upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
   .upload-icon {
     font-size: 28px;
     color: #8c939d;
+    margin-bottom: 8px;
+  }
+
+  .upload-text {
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
   }
 
   .uploaded-image {
