@@ -13,7 +13,9 @@
       "Bash(ls:*)",
       "Bash(netstat -ano)",
       "Bash(findstr \":3000\")",
-      "Bash(findstr \"LISTENING\")"
+      "Bash(findstr \"LISTENING\")",
+      "Bash(xargs grep:*)",
+      "Bash(find F:\\\\xydc\\\\campus-food-order\\\\apps\\\\admin:*)"
     ]
   }
 }

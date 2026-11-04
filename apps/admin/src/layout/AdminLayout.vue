@@ -42,7 +42,7 @@ function handleLogout() {
         text-color="#bfcbd9"
         active-text-color="#409eff"
       >
-        <el-menu-item index="/">
+        <el-menu-item index="/dashboard">
           <el-icon><Odometer /></el-icon>
           <template #title>数据看板</template>
         </el-menu-item>
