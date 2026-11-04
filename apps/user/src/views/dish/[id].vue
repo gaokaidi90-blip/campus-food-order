@@ -38,6 +38,31 @@ async function handleAddToCart() {
   }
 }
 
+/**
+ * 立即购买
+ */
+async function handleBuyNow() {
+  if (!dish.value) return
+
+  // 先加入购物车（不显示提示）
+  const success = await addToCart(dish.value.id, quantity.value, false)
+  if (success) {
+    // 获取刚添加的购物车项ID，跳转到结算页面
+    const { useCartStore } = await import('@/stores/cart')
+    const cartStore = useCartStore()
+    const cartItem = cartStore.cartItems.find(item => item.dishId === dish.value!.id)
+
+    if (cartItem) {
+      router.push({
+        path: '/checkout',
+        query: {
+          items: cartItem.id,
+        },
+      })
+    }
+  }
+}
+
 onMounted(() => {
   fetchDishDetail()
 })
@@ -82,8 +107,11 @@ onMounted(() => {
 
     <div class="footer" v-if="dish">
       <van-stepper v-model="quantity" min="1" :max="dish.stock" />
-      <van-button type="primary" round block @click="handleAddToCart">
+      <van-button type="warning" round @click="handleAddToCart">
         加入购物车
+      </van-button>
+      <van-button type="primary" round @click="handleBuyNow">
+        立即购买
       </van-button>
     </div>
   </div>
@@ -164,6 +192,10 @@ onMounted(() => {
 
   .van-button {
     flex: 1;
+  }
+
+  .van-stepper {
+    flex-shrink: 0;
   }
 }
 </style>
