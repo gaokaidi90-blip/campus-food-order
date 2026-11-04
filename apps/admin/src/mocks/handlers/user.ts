@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import type { Res, User } from '@campus-food/shared'
+import type { Res, User, PageRes } from '@campus-food/shared'
 import { users } from '../data'
 import { validateAdminToken } from './auth'
 
@@ -19,6 +19,8 @@ export const userHandlers = [
 
     const url = new URL(request.url)
     const keyword = url.searchParams.get('keyword') || ''
+    const page = parseInt(url.searchParams.get('page') || '1')
+    const pageSize = parseInt(url.searchParams.get('pageSize') || '10')
 
     // 根据关键词过滤
     let filtered = users
@@ -31,10 +33,21 @@ export const userHandlers = [
       )
     }
 
-    return HttpResponse.json<Res<User[]>>({
+    // 分页
+    const total = filtered.length
+    const start = (page - 1) * pageSize
+    const end = start + pageSize
+    const list = filtered.slice(start, end)
+
+    return HttpResponse.json<Res<PageRes<User>>>({
       code: 200,
       message: 'success',
-      data: filtered,
+      data: {
+        list,
+        total,
+        page,
+        pageSize,
+      },
     })
   }),
 

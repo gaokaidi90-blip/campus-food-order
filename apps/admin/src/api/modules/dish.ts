@@ -1,11 +1,17 @@
-import type { Dish } from '@campus-food/shared'
+import type { Dish, PageRes } from '@campus-food/shared'
 import { get, post, put, del } from '@/utils/request'
 
 /**
  * 获取菜品列表
  */
-export function getDishList(params?: { canteenId?: string; categoryId?: string; keyword?: string }) {
-  return get<Dish[]>('/admin/dishes', { params })
+export function getDishList(params?: {
+  canteenId?: string
+  categoryId?: string
+  keyword?: string
+  page?: number
+  pageSize?: number
+}) {
+  return get<PageRes<Dish>>('/admin/dishes', { params })
 }
 
 /**

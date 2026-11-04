@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import type { Res, Dish } from '@campus-food/shared'
+import type { Res, Dish, PageRes } from '@campus-food/shared'
 import { dishes } from '../data'
 import { validateAdminToken } from './auth'
 
@@ -21,6 +21,8 @@ export const dishHandlers = [
     const canteenId = url.searchParams.get('canteenId') || ''
     const categoryId = url.searchParams.get('categoryId') || ''
     const keyword = url.searchParams.get('keyword') || ''
+    const page = parseInt(url.searchParams.get('page') || '1')
+    const pageSize = parseInt(url.searchParams.get('pageSize') || '10')
 
     // 根据条件过滤
     let filtered = dishes
@@ -36,10 +38,21 @@ export const dishHandlers = [
       )
     }
 
-    return HttpResponse.json<Res<Dish[]>>({
+    // 分页
+    const total = filtered.length
+    const start = (page - 1) * pageSize
+    const end = start + pageSize
+    const list = filtered.slice(start, end)
+
+    return HttpResponse.json<Res<PageRes<Dish>>>({
       code: 200,
       message: 'success',
-      data: filtered,
+      data: {
+        list,
+        total,
+        page,
+        pageSize,
+      },
     })
   }),
 

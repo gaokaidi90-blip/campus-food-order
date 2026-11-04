@@ -1,11 +1,16 @@
-import type { Category } from '@campus-food/shared'
+import type { Category, PageRes } from '@campus-food/shared'
 import { get, post, put, del } from '@/utils/request'
 
 /**
  * 获取分类列表
  */
-export function getCategoryList(params?: { canteenId?: string; keyword?: string }) {
-  return get<Category[]>('/admin/categories', { params })
+export function getCategoryList(params?: {
+  canteenId?: string
+  keyword?: string
+  page?: number
+  pageSize?: number
+}) {
+  return get<PageRes<Category>>('/admin/categories', { params })
 }
 
 /**

@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import type { Res, Category } from '@campus-food/shared'
+import type { Res, Category, PageRes } from '@campus-food/shared'
 import { categories } from '../data'
 import { validateAdminToken } from './auth'
 
@@ -20,6 +20,8 @@ export const categoryHandlers = [
     const url = new URL(request.url)
     const canteenId = url.searchParams.get('canteenId') || ''
     const keyword = url.searchParams.get('keyword') || ''
+    const page = parseInt(url.searchParams.get('page') || '1')
+    const pageSize = parseInt(url.searchParams.get('pageSize') || '10')
 
     // 根据条件过滤
     let filtered = categories
@@ -30,10 +32,21 @@ export const categoryHandlers = [
       filtered = filtered.filter((c) => c.name.includes(keyword))
     }
 
-    return HttpResponse.json<Res<Category[]>>({
+    // 分页
+    const total = filtered.length
+    const start = (page - 1) * pageSize
+    const end = start + pageSize
+    const list = filtered.slice(start, end)
+
+    return HttpResponse.json<Res<PageRes<Category>>>({
       code: 200,
       message: 'success',
-      data: filtered,
+      data: {
+        list,
+        total,
+        page,
+        pageSize,
+      },
     })
   }),
 
