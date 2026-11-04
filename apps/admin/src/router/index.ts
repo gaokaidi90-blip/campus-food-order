@@ -29,6 +29,12 @@ const router = createRouter({
           component: () => import('@/views/canteen/index.vue'),
           meta: { requiresAuth: true },
         },
+        {
+          path: 'category',
+          name: 'category',
+          component: () => import('@/views/category/index.vue'),
+          meta: { requiresAuth: true },
+        },
       ],
     },
   ],
