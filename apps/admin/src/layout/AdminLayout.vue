@@ -43,32 +43,32 @@ function handleLogout() {
         active-text-color="#409eff"
       >
         <el-menu-item index="/dashboard">
-          <el-icon><Odometer /></el-icon>
+          <el-icon><i-ep-odometer /></el-icon>
           <template #title>数据看板</template>
         </el-menu-item>
 
         <el-menu-item index="/canteen">
-          <el-icon><Shop /></el-icon>
+          <el-icon><i-ep-shop /></el-icon>
           <template #title>食堂管理</template>
         </el-menu-item>
 
         <el-menu-item index="/category">
-          <el-icon><Menu /></el-icon>
+          <el-icon><i-ep-menu /></el-icon>
           <template #title>分类管理</template>
         </el-menu-item>
 
         <el-menu-item index="/dish">
-          <el-icon><Food /></el-icon>
+          <el-icon><i-ep-food /></el-icon>
           <template #title>菜品管理</template>
         </el-menu-item>
 
         <el-menu-item index="/order">
-          <el-icon><List /></el-icon>
+          <el-icon><i-ep-list /></el-icon>
           <template #title>订单管理</template>
         </el-menu-item>
 
         <el-menu-item index="/user">
-          <el-icon><User /></el-icon>
+          <el-icon><i-ep-user /></el-icon>
           <template #title>用户管理</template>
         </el-menu-item>
       </el-menu>

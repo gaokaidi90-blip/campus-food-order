@@ -40,7 +40,7 @@ onMounted(() => {
         <el-card shadow="hover">
           <div class="stat-card">
             <div class="stat-icon orders">
-              <el-icon><List /></el-icon>
+              <el-icon><i-ep-list /></el-icon>
             </div>
             <div class="stat-info">
               <div class="stat-value">{{ stats.totalOrders }}</div>
@@ -54,7 +54,7 @@ onMounted(() => {
         <el-card shadow="hover">
           <div class="stat-card">
             <div class="stat-icon today">
-              <el-icon><Calendar /></el-icon>
+              <el-icon><i-ep-calendar /></el-icon>
             </div>
             <div class="stat-info">
               <div class="stat-value">{{ stats.todayOrders }}</div>
@@ -68,7 +68,7 @@ onMounted(() => {
         <el-card shadow="hover">
           <div class="stat-card">
             <div class="stat-icon revenue">
-              <el-icon><Money /></el-icon>
+              <el-icon><i-ep-money /></el-icon>
             </div>
             <div class="stat-info">
               <div class="stat-value">¥{{ stats.totalRevenue.toFixed(2) }}</div>
@@ -82,7 +82,7 @@ onMounted(() => {
         <el-card shadow="hover">
           <div class="stat-card">
             <div class="stat-icon today-revenue">
-              <el-icon><Wallet /></el-icon>
+              <el-icon><i-ep-wallet /></el-icon>
             </div>
             <div class="stat-info">
               <div class="stat-value">¥{{ stats.todayRevenue.toFixed(2) }}</div>
