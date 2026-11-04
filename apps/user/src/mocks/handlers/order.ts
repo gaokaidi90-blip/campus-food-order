@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import type { CreateOrderReq, Order } from '@campus-food/shared'
 import { OrderStatus } from '@campus-food/shared'
-import { orders, dishes, addresses, canteens, carts } from '../data'
+import { orders, dishes, addresses, canteens, carts, saveOrders } from '../data'
 import { validateUserToken } from './auth'
 
 /**
@@ -195,6 +195,9 @@ export const orderHandlers = [
 
     orders.push(newOrder)
 
+    // 保存到 localStorage
+    saveOrders()
+
     // 清空购物车中对应食堂的菜品
     const cartIndices = carts
       .map((c, index) => (c.userId === userId && c.canteenId === body.canteenId ? index : -1))
@@ -260,6 +263,9 @@ export const orderHandlers = [
     order.status = OrderStatus.CANCELLED
     order.cancelReason = body.reason
     order.updatedAt = new Date().toISOString()
+
+    // 保存到 localStorage
+    saveOrders()
 
     return HttpResponse.json({
       code: 200,

@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import type { Res, Order, PageRes } from '@campus-food/shared'
 import { OrderStatus } from '@campus-food/shared'
-import { orders } from '../data'
+import { orders, saveOrders } from '../data'
 import { validateAdminToken } from './auth'
 
 export const orderHandlers = [
@@ -141,6 +141,9 @@ export const orderHandlers = [
       status: body.status,
       updatedAt: new Date().toISOString(),
     }
+
+    // 保存到 localStorage
+    saveOrders()
 
     return HttpResponse.json<Res<Order>>({
       code: 200,
