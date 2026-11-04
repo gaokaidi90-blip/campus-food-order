@@ -33,6 +33,20 @@ function formatDateTime(dateStr: string) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }
 
+/**
+ * 处理返回
+ */
+function handleBack() {
+  // 如果是从结算页跳转过来的（刚下单），替换到订单列表页
+  // 否则正常返回
+  const fromCheckout = route.query.from === 'checkout'
+  if (fromCheckout) {
+    router.replace('/order')
+  } else {
+    router.back()
+  }
+}
+
 onMounted(() => {
   fetchOrderDetail()
 })
@@ -43,7 +57,7 @@ onMounted(() => {
     <van-nav-bar
       title="订单详情"
       left-arrow
-      @click-left="router.back()"
+      @click-left="handleBack"
       fixed
     />
 

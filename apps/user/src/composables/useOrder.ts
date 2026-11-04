@@ -20,8 +20,11 @@ export function useOrder() {
     try {
       const { data: res } = await createOrderApi(data)
       showToast('下单成功')
-      // 跳转到订单详情页
-      router.push(`/order/${res.data.id}`)
+      // 跳转到订单详情页，添加 from 参数标识来源
+      router.push({
+        path: `/order/${res.data.id}`,
+        query: { from: 'checkout' }
+      })
       return res.data
     } catch (error) {
       showToast('下单失败')
