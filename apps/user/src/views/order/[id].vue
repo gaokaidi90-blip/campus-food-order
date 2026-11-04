@@ -2,14 +2,28 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useOrderStore } from '@/stores/order'
-import { OrderStatusLabel } from '@campus-food/shared'
-import { showToast } from 'vant'
+import { OrderStatus, OrderStatusLabel } from '@campus-food/shared'
+import { cancelOrder } from '@/api'
+import { showToast, showDialog } from 'vant'
 
 const route = useRoute()
 const router = useRouter()
 const orderStore = useOrderStore()
 
 const loading = ref(false)
+const showCancelDialog = ref(false)
+const cancelReason = ref('')
+const otherReason = ref('')
+
+// 取消原因选项
+const cancelReasons = [
+  '我不想要了',
+  '信息填写错误，重新下单',
+  '商家出餐太慢',
+  '餐品价格有变动',
+  '配送地址选错了',
+  '其他原因',
+]
 
 /**
  * 加载订单详情
@@ -44,6 +58,47 @@ function handleBack() {
     router.replace('/order')
   } else {
     router.back()
+  }
+}
+
+/**
+ * 取消订单
+ */
+async function handleCancelOrder() {
+  if (!orderStore.currentOrder) return
+  cancelReason.value = ''
+  otherReason.value = ''
+  showCancelDialog.value = true
+}
+
+/**
+ * 确认取消订单
+ */
+async function confirmCancelOrder() {
+  if (!cancelReason.value) {
+    showToast('请选择取消原因')
+    return
+  }
+
+  // 如果选择了"其他原因"，必须填写具体原因
+  if (cancelReason.value === '其他原因' && !otherReason.value.trim()) {
+    showToast('请输入取消原因')
+    return
+  }
+
+  loading.value = true
+  try {
+    // 如果是其他原因，使用用户输入的内容
+    const reason = cancelReason.value === '其他原因' ? otherReason.value.trim() : cancelReason.value
+    await cancelOrder(orderStore.currentOrder!.id, reason)
+    showToast('订单已取消')
+    showCancelDialog.value = false
+    // 重新加载订单详情
+    await fetchOrderDetail()
+  } catch (error) {
+    showToast('取消失败')
+  } finally {
+    loading.value = false
   }
 }
 
@@ -116,13 +171,93 @@ onMounted(() => {
             :value="orderStore.currentOrder.remark"
           />
           <van-cell
+            v-if="orderStore.currentOrder.status === 'cancelled' && orderStore.currentOrder.cancelReason"
+            title="取消原因"
+            :value="orderStore.currentOrder.cancelReason"
+          />
+          <van-cell
             title="合计"
             :value="`¥${orderStore.currentOrder.totalAmount}`"
             class="total-cell"
           />
         </van-cell-group>
+
+        <!-- 操作按钮 -->
+        <div
+          v-if="orderStore.currentOrder.status === 'pending' || orderStore.currentOrder.status === 'accepted'"
+          class="action-buttons"
+        >
+          <van-button
+            type="warning"
+            block
+            round
+            @click="handleCancelOrder"
+          >
+            取消订单
+          </van-button>
+        </div>
       </template>
     </div>
+
+    <!-- 取消订单对话框 -->
+    <van-popup
+      v-model:show="showCancelDialog"
+      position="bottom"
+      round
+      :style="{ padding: '20px' }"
+    >
+      <div class="cancel-dialog">
+        <div class="cancel-title">请选择取消原因</div>
+        <van-radio-group v-model="cancelReason">
+          <van-cell-group inset>
+            <van-cell
+              v-for="reason in cancelReasons"
+              :key="reason"
+              clickable
+              @click="cancelReason = reason"
+            >
+              <template #title>
+                <span>{{ reason }}</span>
+              </template>
+              <template #right-icon>
+                <van-radio :name="reason" />
+              </template>
+            </van-cell>
+          </van-cell-group>
+        </van-radio-group>
+
+        <!-- 其他原因输入框 -->
+        <div v-if="cancelReason === '其他原因'" class="other-reason">
+          <van-field
+            v-model="otherReason"
+            type="textarea"
+            rows="3"
+            maxlength="100"
+            placeholder="请输入取消原因（必填）"
+            show-word-limit
+          />
+        </div>
+
+        <div class="cancel-actions">
+          <van-button
+            block
+            round
+            @click="showCancelDialog = false"
+          >
+            我再想想
+          </van-button>
+          <van-button
+            type="danger"
+            block
+            round
+            :loading="loading"
+            @click="confirmCancelOrder"
+          >
+            确认取消
+          </van-button>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -215,5 +350,31 @@ onMounted(() => {
     font-weight: bold;
     color: #ee0a24;
   }
+}
+
+.action-buttons {
+  padding: 16px;
+}
+
+.cancel-dialog {
+  padding: 8px 0;
+}
+
+.cancel-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #323233;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.other-reason {
+  margin-top: 16px;
+}
+
+.cancel-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
 }
 </style>

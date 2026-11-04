@@ -12,6 +12,7 @@ export interface Order {
   status: OrderStatus
   totalAmount: number
   remark?: string
+  cancelReason?: string
   createdAt: string
   updatedAt: string
   items: OrderItem[]

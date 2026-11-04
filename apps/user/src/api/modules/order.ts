@@ -26,3 +26,12 @@ export function getOrderDetail(id: string) {
 export function createOrder(data: CreateOrderReq) {
   return post<Order>('/user/orders', data)
 }
+
+/**
+ * 取消订单
+ * @param id 订单 ID
+ * @param reason 取消原因
+ */
+export function cancelOrder(id: string, reason: string) {
+  return post<Order>(`/user/orders/${id}/cancel`, { reason })
+}

@@ -48,6 +48,12 @@ function formatDateTime(dateStr: string) {
           </div>
         </div>
       </div>
+
+      <!-- 已取消订单显示取消原因 -->
+      <div v-if="order.status === 'cancelled' && order.cancelReason" class="cancel-reason">
+        <van-icon name="info-o" />
+        <span>取消原因：{{ order.cancelReason }}</span>
+      </div>
     </div>
 
     <div class="order-footer">
@@ -147,6 +153,18 @@ function formatDateTime(dateStr: string) {
 .item-quantity {
   font-size: 13px;
   color: #969799;
+}
+
+.cancel-reason {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 8px;
+  background: #fff7e6;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #ed6a0c;
 }
 
 .order-footer {

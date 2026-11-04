@@ -211,4 +211,60 @@ export const orderHandlers = [
       data: newOrder,
     })
   }),
+
+  // 取消订单
+  http.post('/api/user/orders/:id/cancel', async ({ request, params }) => {
+    const token = validateUserToken(request)
+
+    if (!token) {
+      return HttpResponse.json(
+        {
+          code: 401,
+          message: '未授权访问',
+          data: null,
+        },
+        { status: 401 }
+      )
+    }
+
+    const userId = token.split('_')[2]
+    const { id } = params
+    const body = (await request.json()) as { reason: string }
+
+    const order = orders.find((o) => o.id === id && o.userId === userId)
+
+    if (!order) {
+      return HttpResponse.json(
+        {
+          code: 404,
+          message: '订单不存在',
+          data: null,
+        },
+        { status: 404 }
+      )
+    }
+
+    // 只有待接单和已接单状态可以取消
+    if (order.status !== OrderStatus.PENDING && order.status !== OrderStatus.ACCEPTED) {
+      return HttpResponse.json(
+        {
+          code: 400,
+          message: '该订单状态不允许取消',
+          data: null,
+        },
+        { status: 400 }
+      )
+    }
+
+    // 更新订单状态为已取消
+    order.status = OrderStatus.CANCELLED
+    order.cancelReason = body.reason
+    order.updatedAt = new Date().toISOString()
+
+    return HttpResponse.json({
+      code: 200,
+      message: 'success',
+      data: order,
+    })
+  }),
 ]
