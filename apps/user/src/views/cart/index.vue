@@ -170,9 +170,17 @@ onMounted(() => {
       :price="checkedTotalPrice * 100"
       button-text="结算"
       @submit="handleCheckout"
+      style="bottom: 50px"
     >
       <van-checkbox v-model="isAllChecked">全选</van-checkbox>
     </van-submit-bar>
+
+    <van-tabbar route>
+      <van-tabbar-item icon="wap-home" to="/">首页</van-tabbar-item>
+      <van-tabbar-item icon="shopping-cart" to="/cart">购物车</van-tabbar-item>
+      <van-tabbar-item icon="orders-o" to="/order">订单</van-tabbar-item>
+      <van-tabbar-item icon="user-o" to="/profile">我的</van-tabbar-item>
+    </van-tabbar>
   </div>
 </template>
 
@@ -180,12 +188,12 @@ onMounted(() => {
 .cart-container {
   min-height: 100vh;
   background: #f7f8fa;
-  padding-bottom: 50px;
+  padding-bottom: 100px;
 }
 
 .content {
   padding-top: 46px;
-  min-height: calc(100vh - 50px);
+  min-height: calc(100vh - 100px);
 }
 
 .cart-item {

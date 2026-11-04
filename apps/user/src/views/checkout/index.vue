@@ -167,7 +167,15 @@ onMounted(() => {
       button-text="提交订单"
       :loading="loading"
       @submit="handleSubmit"
+      style="bottom: 50px"
     />
+
+    <van-tabbar route>
+      <van-tabbar-item icon="wap-home" to="/">首页</van-tabbar-item>
+      <van-tabbar-item icon="shopping-cart" to="/cart">购物车</van-tabbar-item>
+      <van-tabbar-item icon="orders-o" to="/order">订单</van-tabbar-item>
+      <van-tabbar-item icon="user-o" to="/profile">我的</van-tabbar-item>
+    </van-tabbar>
   </div>
 </template>
 
@@ -175,7 +183,7 @@ onMounted(() => {
 .checkout-container {
   min-height: 100vh;
   background: #f7f8fa;
-  padding-bottom: 50px;
+  padding-bottom: 100px;
 }
 
 .content {
