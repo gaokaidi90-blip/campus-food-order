@@ -1,11 +1,11 @@
-import type { Canteen } from '@campus-food/shared'
+import type { Canteen, PageRes } from '@campus-food/shared'
 import { get, post, put, del } from '@/utils/request'
 
 /**
  * 获取食堂列表
  */
-export function getCanteenList(params?: { keyword?: string }) {
-  return get<Canteen[]>('/admin/canteens', { params })
+export function getCanteenList(params?: { keyword?: string; page?: number; pageSize?: number }) {
+  return get<PageRes<Canteen>>('/admin/canteens', { params })
 }
 
 /**

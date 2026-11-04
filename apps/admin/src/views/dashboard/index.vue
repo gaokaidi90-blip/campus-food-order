@@ -1,17 +1,40 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { getDashboardStats } from '@/api'
+import { ElMessage } from 'element-plus'
 
-// 临时数据，后续会从 API 获取
+// 统计数据
 const stats = ref({
   totalOrders: 0,
   todayOrders: 0,
   totalRevenue: 0,
   todayRevenue: 0,
 })
+
+const loading = ref(false)
+
+/**
+ * 加载统计数据
+ */
+async function fetchStats() {
+  loading.value = true
+  try {
+    const { data } = await getDashboardStats()
+    stats.value = data.data
+  } catch (error) {
+    ElMessage.error('加载统计数据失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchStats()
+})
 </script>
 
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container" v-loading="loading">
     <el-row :gutter="20">
       <el-col :span="6">
         <el-card shadow="hover">
@@ -48,7 +71,7 @@ const stats = ref({
               <el-icon><Money /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">¥{{ stats.totalRevenue }}</div>
+              <div class="stat-value">¥{{ stats.totalRevenue.toFixed(2) }}</div>
               <div class="stat-label">总营业额</div>
             </div>
           </div>
@@ -62,7 +85,7 @@ const stats = ref({
               <el-icon><Wallet /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">¥{{ stats.todayRevenue }}</div>
+              <div class="stat-value">¥{{ stats.todayRevenue.toFixed(2) }}</div>
               <div class="stat-label">今日营业额</div>
             </div>
           </div>
