@@ -41,7 +41,7 @@ const rules: FormRules = {
 async function loadCanteens() {
   try {
     const { data } = await getCanteenList()
-    canteens.value = data.data
+    canteens.value = data.data.list
   } catch (error) {
     ElMessage.error('加载食堂列表失败')
   }

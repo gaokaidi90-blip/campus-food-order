@@ -4,6 +4,7 @@ import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { createCanteen, updateCanteen } from '@/api'
 import type { Canteen } from '@campus-food/shared'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 interface Props {
   canteen: Canteen | null
@@ -36,7 +37,7 @@ const rules: FormRules = {
   description: [{ required: true, message: '请输入描述', trigger: 'blur' }],
   location: [{ required: true, message: '请输入位置', trigger: 'blur' }],
   businessHours: [{ required: true, message: '请输入营业时间', trigger: 'blur' }],
-  image: [{ required: true, message: '请输入图片 URL', trigger: 'blur' }],
+  image: [{ required: true, message: '请上传食堂图片', trigger: 'change' }],
 }
 
 /**
@@ -124,8 +125,8 @@ function handleCancel() {
       <el-input v-model="form.businessHours" placeholder="例如：07:00 - 20:00" />
     </el-form-item>
 
-    <el-form-item label="图片 URL" prop="image">
-      <el-input v-model="form.image" placeholder="请输入图片 URL" />
+    <el-form-item label="食堂图片" prop="image">
+      <ImageUpload v-model="form.image" />
     </el-form-item>
 
     <el-form-item label="状态" prop="status">

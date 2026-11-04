@@ -4,6 +4,7 @@ import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { createDish, updateDish, getCanteenList, getCategoryList } from '@/api'
 import type { Dish, Canteen, Category } from '@campus-food/shared'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 interface Props {
   dish: Dish | null
@@ -42,7 +43,7 @@ const rules: FormRules = {
   categoryId: [{ required: true, message: '请选择菜品分类', trigger: 'change' }],
   name: [{ required: true, message: '请输入菜品名称', trigger: 'blur' }],
   description: [{ required: true, message: '请输入菜品描述', trigger: 'blur' }],
-  image: [{ required: true, message: '请输入图片 URL', trigger: 'blur' }],
+  image: [{ required: true, message: '请上传菜品图片', trigger: 'change' }],
   price: [
     { required: true, message: '请输入价格', trigger: 'blur' },
     { type: 'number', min: 0.01, message: '价格必须大于0', trigger: 'blur' },
@@ -59,7 +60,7 @@ const rules: FormRules = {
 async function loadCanteens() {
   try {
     const { data } = await getCanteenList()
-    canteens.value = data.data
+    canteens.value = data.data.list
   } catch (error) {
     ElMessage.error('加载食堂列表失败')
   }
@@ -77,7 +78,7 @@ async function loadCategories() {
 
   try {
     const { data } = await getCategoryList({ canteenId: form.value.canteenId })
-    categories.value = data.data
+    categories.value = data.data.list
   } catch (error) {
     ElMessage.error('加载分类列表失败')
   }
@@ -216,8 +217,8 @@ loadCanteens()
       />
     </el-form-item>
 
-    <el-form-item label="图片 URL" prop="image">
-      <el-input v-model="form.image" placeholder="请输入图片 URL" />
+    <el-form-item label="菜品图片" prop="image">
+      <ImageUpload v-model="form.image" />
     </el-form-item>
 
     <el-form-item label="价格" prop="price">
