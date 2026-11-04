@@ -141,6 +141,13 @@ function getCanteenName(id: string) {
   return canteens.value.find((c) => c.id === id)?.name || '-'
 }
 
+/**
+ * 计算全局序号
+ */
+function indexMethod(index: number) {
+  return (currentPage.value - 1) * pageSize.value + index + 1
+}
+
 onMounted(() => {
   loadCanteens()
   loadCategories()
@@ -188,6 +195,7 @@ onMounted(() => {
 
       <!-- 分类列表 -->
       <el-table :data="categories" :loading="loading" style="width: 100%">
+        <el-table-column type="index" label="序号" width="80" :index="indexMethod" />
         <el-table-column prop="name" label="分类名称" width="200" />
         <el-table-column label="所属食堂" width="200">
           <template #default="{ row }">

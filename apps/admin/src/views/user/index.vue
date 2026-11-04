@@ -65,6 +65,13 @@ function handleSizeChange(size: number) {
   loadUsers()
 }
 
+/**
+ * 计算全局序号
+ */
+function indexMethod(index: number) {
+  return (currentPage.value - 1) * pageSize.value + index + 1
+}
+
 onMounted(() => {
   loadUsers()
 })
@@ -94,6 +101,7 @@ onMounted(() => {
 
       <!-- 用户列表 -->
       <el-table :data="users" :loading="loading" style="width: 100%">
+        <el-table-column type="index" label="序号" width="80" :index="indexMethod" />
         <el-table-column label="头像" width="80">
           <template #default="{ row }">
             <el-avatar v-if="row.avatar" :src="row.avatar" :size="50" />

@@ -173,6 +173,13 @@ function getCategoryName(id: string) {
   return categories.value.find((c) => c.id === id)?.name || '-'
 }
 
+/**
+ * 计算全局序号
+ */
+function indexMethod(index: number) {
+  return (currentPage.value - 1) * pageSize.value + index + 1
+}
+
 onMounted(() => {
   loadCanteens()
   loadCategories()
@@ -236,6 +243,7 @@ onMounted(() => {
 
       <!-- 菜品列表 -->
       <el-table :data="dishes" :loading="loading" style="width: 100%">
+        <el-table-column type="index" label="序号" width="80" :index="indexMethod" />
         <el-table-column label="图片" width="100">
           <template #default="{ row }">
             <el-image

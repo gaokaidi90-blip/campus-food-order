@@ -109,6 +109,20 @@ function handleSuccess() {
   loadCanteens()
 }
 
+/**
+ * 刷新列表
+ */
+function handleRefresh() {
+  loadCanteens()
+}
+
+/**
+ * 计算全局序号
+ */
+function indexMethod(index: number) {
+  return (currentPage.value - 1) * pageSize.value + index + 1
+}
+
 onMounted(() => {
   loadCanteens()
 })
@@ -138,6 +152,7 @@ onMounted(() => {
 
       <!-- 食堂列表 -->
       <el-table :data="canteens" :loading="loading" style="width: 100%">
+        <el-table-column type="index" label="序号" width="80" :index="indexMethod" />
         <el-table-column prop="name" label="食堂名称" width="200" />
         <el-table-column prop="description" label="描述" />
         <el-table-column prop="location" label="位置" width="200" />
