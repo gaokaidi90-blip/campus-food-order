@@ -11,4 +11,4 @@ export {
   orders,
   addresses,
   carts,
-} from '@campus-food/shared/mocks'
+} from '../../../../../packages/shared/src/mocks'

@@ -10,4 +10,4 @@ export {
   dishes,
   orders,
   addresses,
-} from '@campus-food/shared/mocks'
+} from '../../../../../packages/shared/src/mocks'

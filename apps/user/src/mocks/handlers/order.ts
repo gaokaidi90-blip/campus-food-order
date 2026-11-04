@@ -1,11 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import type { CreateOrderReq, Order } from '@campus-food/shared'
 import { OrderStatus } from '@campus-food/shared'
-import { orders } from '../data/orders'
-import { dishes } from '../data/dishes'
-import { addresses } from '../data/addresses'
-import { canteens } from '../data/canteens'
-import { carts } from '../data/carts'
+import { orders, dishes, addresses, canteens, carts } from '../data'
 import { validateUserToken } from './auth'
 
 /**

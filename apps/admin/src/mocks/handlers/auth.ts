@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import type { Res } from '@campus-food/shared'
-import { admins } from '../data/admins'
+import { admins } from '../data'
 
 /**
  * 验证管理员 token

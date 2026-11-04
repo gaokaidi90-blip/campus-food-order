@@ -23,12 +23,13 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@campus-food/shared': fileURLToPath(
-        new URL('../../packages/shared/src/index.ts', import.meta.url)
+        new URL('../../packages/shared/src', import.meta.url)
       ),
     },
   },
   server: {
     port: 3001,
+    strictPort: true,
   },
   css: {
     preprocessorOptions: {

@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import type { Res } from '@campus-food/shared'
-import { dishes } from '../data/dishes'
+import { dishes } from '../data'
 import { validateUserToken } from './auth'
 
 export const dishHandlers = [

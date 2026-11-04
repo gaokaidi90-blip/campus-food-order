@@ -4,10 +4,13 @@
 export interface Admin {
   id: string
   username: string
+  password: string
   name: string
   phone: string
+  role: 'admin' | 'superadmin'
   avatar?: string
   createdAt: string
+  updatedAt: string
 }
 
 /**

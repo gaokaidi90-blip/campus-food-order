@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import type { Res, User } from '@campus-food/shared'
-import { users } from '../data/users'
+import { users } from '../data'
 import { validateUserToken } from './auth'
 
 export const profileHandlers = [

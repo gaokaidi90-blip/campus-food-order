@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import type { Res, UserLoginReq, UserLoginRes } from '@campus-food/shared'
-import { users, userPasswords } from '../data/users'
+import { users, userPasswords } from '../data'
 
 /**
  * 管理员账号数据（用于统一登录页）

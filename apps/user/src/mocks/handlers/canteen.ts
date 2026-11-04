@@ -1,8 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import type { Res } from '@campus-food/shared'
-import { canteens } from '../data/canteens'
-import { categories } from '../data/categories'
-import { dishes } from '../data/dishes'
+import { canteens, categories, dishes } from '../data'
 import { validateUserToken } from './auth'
 
 export const canteenHandlers = [

@@ -1,7 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import type { AddCartReq, UpdateCartReq } from '@campus-food/shared'
-import { carts } from '../data/carts'
-import { dishes } from '../data/dishes'
+import { carts, dishes } from '../data'
 import { validateUserToken } from './auth'
 
 /**

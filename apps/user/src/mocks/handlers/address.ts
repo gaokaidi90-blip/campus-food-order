@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import type { CreateAddressReq, UpdateAddressReq } from '@campus-food/shared'
-import { addresses } from '../data/addresses'
+import { addresses } from '../data'
 import { validateUserToken } from './auth'
 
 /**
