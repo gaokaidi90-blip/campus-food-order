@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { getUserProfile } from '@/api'
+import { getUserProfile, updateUserProfile } from '@/api'
 import { showToast, showConfirmDialog } from 'vant'
 import type { User } from '@campus-food/shared'
 
@@ -11,6 +11,11 @@ const userStore = useUserStore()
 
 const loading = ref(false)
 const userInfo = ref<Omit<User, 'password'> | null>(null)
+const showEditDialog = ref(false)
+const editForm = ref({
+  name: '',
+  avatar: [] as any[]
+})
 
 /**
  * 加载用户信息
@@ -62,6 +67,59 @@ function goToAddress() {
   router.push('/address')
 }
 
+/**
+ * 打开编辑对话框
+ */
+function handleEdit() {
+  if (!userInfo.value) return
+  editForm.value.name = userInfo.value.name
+  editForm.value.avatar = []
+  showEditDialog.value = true
+}
+
+/**
+ * 保存用户信息
+ */
+async function handleSave() {
+  if (!editForm.value.name.trim()) {
+    showToast('请输入昵称')
+    return
+  }
+
+  loading.value = true
+  try {
+    // 处理头像：如果有上传的文件，转换为 base64；否则保持原头像
+    let avatarUrl = userInfo.value?.avatar || ''
+    if (editForm.value.avatar.length > 0) {
+      const file = editForm.value.avatar[0]
+      if (file.content) {
+        // 新上传的文件，使用 base64
+        avatarUrl = file.content
+      }
+    }
+
+    const { data } = await updateUserProfile({
+      name: editForm.value.name,
+      avatar: avatarUrl || undefined,
+    })
+    userInfo.value = data.data
+    showEditDialog.value = false
+    showToast('保存成功')
+  } catch (error) {
+    showToast('保存失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+/**
+ * 图片上传后读取为 base64
+ */
+function afterRead(file: any) {
+  // van-uploader 会自动将图片转为 base64 并存储在 file.content 中
+  // 不需要额外处理
+}
+
 onMounted(() => {
   fetchUserInfo()
 })
@@ -76,12 +134,26 @@ onMounted(() => {
       <div class="user-card">
         <van-skeleton :loading="loading" :row="3">
           <div v-if="userInfo" class="user-info">
-            <van-icon name="user-circle-o" class="avatar" />
+            <van-image
+              v-if="userInfo.avatar"
+              :src="userInfo.avatar"
+              class="avatar-img"
+              round
+            />
+            <van-icon v-else name="user-circle-o" class="avatar" />
             <div class="info">
               <div class="name">{{ userInfo.name }}</div>
               <div class="student-id">学号：{{ userInfo.studentId }}</div>
               <div class="phone">手机：{{ userInfo.phone }}</div>
             </div>
+            <van-button
+              type="primary"
+              size="small"
+              round
+              @click="handleEdit"
+            >
+              编辑
+            </van-button>
           </div>
         </van-skeleton>
       </div>
@@ -104,6 +176,32 @@ onMounted(() => {
       <van-tabbar-item icon="orders-o" to="/order">订单</van-tabbar-item>
       <van-tabbar-item icon="user-o" to="/profile">我的</van-tabbar-item>
     </van-tabbar>
+
+    <!-- 编辑对话框 -->
+    <van-dialog
+      v-model:show="showEditDialog"
+      title="编辑资料"
+      show-cancel-button
+      @confirm="handleSave"
+    >
+      <van-form class="edit-form">
+        <van-field
+          v-model="editForm.name"
+          label="昵称"
+          placeholder="请输入昵称"
+          required
+        />
+        <van-field label="头像">
+          <template #input>
+            <van-uploader
+              v-model="editForm.avatar"
+              :max-count="1"
+              :after-read="afterRead"
+            />
+          </template>
+        </van-field>
+      </van-form>
+    </van-dialog>
   </div>
 </template>
 
@@ -133,10 +231,19 @@ onMounted(() => {
   font-size: 64px;
   color: #1989fa;
   margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 64px;
+  height: 64px;
+  margin-right: 16px;
+  flex-shrink: 0;
 }
 
 .info {
   flex: 1;
+  min-width: 0;
 }
 
 .name {
@@ -156,5 +263,9 @@ onMounted(() => {
 .logout-wrapper {
   margin-top: 24px;
   padding: 0 16px;
+}
+
+.edit-form {
+  padding: 16px;
 }
 </style>
