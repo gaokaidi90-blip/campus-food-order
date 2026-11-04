@@ -10,6 +10,9 @@ const categories = ref<Category[]>([])
 const canteens = ref<Canteen[]>([])
 const keyword = ref('')
 const canteenId = ref('')
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(10)
 
 // 对话框控制
 const dialogVisible = ref(false)
@@ -22,7 +25,7 @@ const currentCategory = ref<Category | null>(null)
 async function loadCanteens() {
   try {
     const { data } = await getCanteenList()
-    canteens.value = data.data
+    canteens.value = data.data.list
   } catch (error) {
     ElMessage.error('加载食堂列表失败')
   }
@@ -37,8 +40,11 @@ async function loadCategories() {
     const { data } = await getCategoryList({
       canteenId: canteenId.value,
       keyword: keyword.value,
+      page: currentPage.value,
+      pageSize: pageSize.value,
     })
-    categories.value = data.data
+    categories.value = data.data.list
+    total.value = data.data.total
   } catch (error) {
     ElMessage.error('加载失败')
   } finally {
@@ -50,6 +56,7 @@ async function loadCategories() {
  * 搜索
  */
 function handleSearch() {
+  currentPage.value = 1
   loadCategories()
 }
 
@@ -59,6 +66,24 @@ function handleSearch() {
 function handleReset() {
   keyword.value = ''
   canteenId.value = ''
+  currentPage.value = 1
+  loadCategories()
+}
+
+/**
+ * 页码改变
+ */
+function handlePageChange(page: number) {
+  currentPage.value = page
+  loadCategories()
+}
+
+/**
+ * 页大小改变
+ */
+function handleSizeChange(size: number) {
+  pageSize.value = size
+  currentPage.value = 1
   loadCategories()
 }
 
@@ -186,6 +211,18 @@ onMounted(() => {
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- 分页 -->
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @current-change="handlePageChange"
+        @size-change="handleSizeChange"
+        style="margin-top: 20px; justify-content: flex-end"
+      />
     </el-card>
 
     <!-- 新增/编辑对话框 -->

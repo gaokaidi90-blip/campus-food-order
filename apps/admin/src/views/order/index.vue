@@ -11,6 +11,9 @@ const orders = ref<Order[]>([])
 const canteens = ref<Canteen[]>([])
 const canteenId = ref('')
 const status = ref('')
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(10)
 
 // 状态选项
 const statusOptions = [
@@ -26,7 +29,7 @@ const statusOptions = [
 async function loadCanteens() {
   try {
     const { data } = await getCanteenList()
-    canteens.value = data.data
+    canteens.value = data.data.list
   } catch (error) {
     ElMessage.error('加载食堂列表失败')
   }
@@ -41,8 +44,11 @@ async function loadOrders() {
     const { data } = await getOrderList({
       canteenId: canteenId.value,
       status: status.value,
+      page: currentPage.value,
+      pageSize: pageSize.value,
     })
-    orders.value = data.data
+    orders.value = data.data.list
+    total.value = data.data.total
   } catch (error) {
     ElMessage.error('加载失败')
   } finally {
@@ -54,6 +60,24 @@ async function loadOrders() {
  * 搜索
  */
 function handleSearch() {
+  currentPage.value = 1
+  loadOrders()
+}
+
+/**
+ * 页码改变
+ */
+function handlePageChange(page: number) {
+  currentPage.value = page
+  loadOrders()
+}
+
+/**
+ * 页大小改变
+ */
+function handleSizeChange(size: number) {
+  pageSize.value = size
+  currentPage.value = 1
   loadOrders()
 }
 
@@ -63,6 +87,7 @@ function handleSearch() {
 function handleReset() {
   canteenId.value = ''
   status.value = ''
+  currentPage.value = 1
   loadOrders()
 }
 
@@ -135,6 +160,19 @@ onMounted(() => {
         @refresh="handleRefresh"
       />
     </div>
+
+    <!-- 分页 -->
+    <el-card shadow="never" style="margin-top: 16px">
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @current-change="handlePageChange"
+        @size-change="handleSizeChange"
+      />
+    </el-card>
   </div>
 </template>
 
