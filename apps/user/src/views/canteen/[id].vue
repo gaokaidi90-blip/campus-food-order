@@ -5,6 +5,7 @@ import type { Canteen, Category, Dish } from '@campus-food/shared'
 import { getCanteenDetail, getDishes } from '@/api'
 import { showToast } from 'vant'
 import DishCard from '@/components/DishCard.vue'
+import { useCartStore } from '@/stores/cart'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,6 +15,7 @@ const canteen = ref<Canteen | null>(null)
 const categories = ref<Category[]>([])
 const dishes = ref<Dish[]>([])
 const activeCategory = ref('')
+const cartStore = useCartStore()
 
 const filteredDishes = computed(() => {
   if (!activeCategory.value) return dishes.value
@@ -50,6 +52,10 @@ function handleDishClick(dish: Dish) {
   router.push(`/dish/${dish.id}`)
 }
 
+function handleCartClick() {
+  router.push('/cart')
+}
+
 onMounted(() => {
   fetchCanteenDetail()
   fetchDishes()
@@ -63,7 +69,13 @@ onMounted(() => {
       left-arrow
       @click-left="router.back()"
       fixed
-    />
+    >
+      <template #right>
+        <van-badge :content="cartStore.cartItems.length || ''" :show-zero="false">
+          <van-icon name="shopping-cart-o" size="20" @click="handleCartClick" />
+        </van-badge>
+      </template>
+    </van-nav-bar>
 
     <div class="content">
       <van-loading v-if="loading" class="loading" />
