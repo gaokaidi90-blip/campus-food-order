@@ -45,7 +45,8 @@ __screenshots__/
 # TypeScript build output
 *.d.ts
 *.js
-!vite.config.js
-!vite.config.*.js
 !*.config.js
 !.eslintrc.js
+# 但要忽略从 .ts 编译出的 .js
+apps/**/vite.config.js
+packages/**/vite.config.js
