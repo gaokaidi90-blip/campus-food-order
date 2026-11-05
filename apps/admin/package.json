@@ -19,9 +19,11 @@
     "vue-router": "^5.3.1"
   },
   "devDependencies": {
+    "@iconify-json/ep": "^1.2.4",
     "less": "^4.2.1",
     "msw": "^2.7.0",
     "unplugin-auto-import": "^0.9.5",
+    "unplugin-icons": "^24.0.0",
     "unplugin-vue-components": "^0.27.4"
   },
   "msw": {

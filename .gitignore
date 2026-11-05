@@ -41,3 +41,11 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# TypeScript build output
+*.d.ts
+*.js
+!vite.config.js
+!vite.config.*.js
+!*.config.js
+!.eslintrc.js

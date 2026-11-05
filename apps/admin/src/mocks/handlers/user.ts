@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import type { Res, User, PageRes } from '@campus-food/shared'
-import { users } from '../data'
+import { users, saveUsers } from '../data'
 import { validateAdminToken } from './auth'
 
 export const userHandlers = [
@@ -77,6 +77,47 @@ export const userHandlers = [
       code: 200,
       message: 'success',
       data: user,
+    })
+  }),
+
+  /**
+   * 更新用户信息
+   */
+  http.put('/api/admin/users/:id', async ({ request, params }) => {
+    const token = validateAdminToken(request)
+    if (!token) {
+      return HttpResponse.json<Res<null>>(
+        { code: 401, message: '未授权访问', data: null },
+        { status: 401 }
+      )
+    }
+
+    const { id } = params
+    const body = (await request.json()) as { name: string; phone: string; avatar: string }
+
+    const index = users.findIndex((u) => u.id === id)
+    if (index === -1) {
+      return HttpResponse.json<Res<null>>(
+        { code: 404, message: '用户不存在', data: null },
+        { status: 404 }
+      )
+    }
+
+    // 更新用户信息
+    users[index] = {
+      ...users[index],
+      name: body.name,
+      phone: body.phone,
+      avatar: body.avatar,
+      updatedAt: new Date().toISOString(),
+    }
+
+    saveUsers()
+
+    return HttpResponse.json<Res<User>>({
+      code: 200,
+      message: '更新成功',
+      data: users[index],
     })
   }),
 ]

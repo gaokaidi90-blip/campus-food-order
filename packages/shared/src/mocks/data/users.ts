@@ -1,9 +1,12 @@
 import type { User } from '@campus-food/shared'
+import { loadFromStorage, saveToStorage } from './storage'
+
+const STORAGE_KEY = 'mock_users'
 
 /**
  * 测试用户数据
  */
-export const users: User[] = [
+export const users: User[] = loadFromStorage<User[]>(STORAGE_KEY, [
   {
     id: '1',
     studentId: '2021001',
@@ -27,7 +30,14 @@ export const users: User[] = [
     phone: '13800138003',
     createdAt: '2024-01-03T00:00:00.000Z',
   },
-]
+])
+
+/**
+ * 保存用户数据到 localStorage
+ */
+export function saveUsers(): void {
+  saveToStorage(STORAGE_KEY, users)
+}
 
 /**
  * 用户密码映射 (明文存储仅用于开发)

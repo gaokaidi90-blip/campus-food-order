@@ -80,15 +80,15 @@ function handleLogout() {
       <el-header class="header">
         <div class="header-left">
           <el-icon class="collapse-icon" @click="toggleCollapse">
-            <Fold v-if="!isCollapse" />
-            <Expand v-else />
+            <i-ep-fold v-if="!isCollapse" />
+            <i-ep-expand v-else />
           </el-icon>
         </div>
 
         <div class="header-right">
           <el-dropdown @command="handleLogout">
             <span class="user-info">
-              <el-icon><User /></el-icon>
+            <i-ep-user />
               <span>{{ adminStore.adminInfo?.name || '管理员' }}</span>
             </span>
             <template #dropdown>

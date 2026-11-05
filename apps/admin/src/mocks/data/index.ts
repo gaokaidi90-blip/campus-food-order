@@ -5,6 +5,7 @@
 export {
   admins,
   users,
+  saveUsers,
   canteens,
   categories,
   dishes,

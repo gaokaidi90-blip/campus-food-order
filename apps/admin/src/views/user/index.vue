@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getUserList } from '@/api'
 import type { User } from '@campus-food/shared'
+import UserForm from './components/UserForm.vue'
 
 const loading = ref(false)
 const users = ref<User[]>([])
@@ -10,6 +11,10 @@ const keyword = ref('')
 const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(10)
+
+// 编辑对话框
+const dialogVisible = ref(false)
+const currentUser = ref<User | null>(null)
 
 /**
  * 加载用户列表
@@ -72,6 +77,30 @@ function indexMethod(index: number) {
   return (currentPage.value - 1) * pageSize.value + index + 1
 }
 
+/**
+ * 编辑用户
+ */
+function handleEdit(user: User) {
+  currentUser.value = user
+  dialogVisible.value = true
+}
+
+/**
+ * 编辑成功
+ */
+function handleEditSuccess() {
+  dialogVisible.value = false
+  loadUsers()
+}
+
+/**
+ * 取消编辑
+ */
+function handleEditCancel() {
+  dialogVisible.value = false
+  currentUser.value = null
+}
+
 onMounted(() => {
   loadUsers()
 })
@@ -116,6 +145,11 @@ onMounted(() => {
             {{ new Date(row.createdAt).toLocaleString() }}
           </template>
         </el-table-column>
+        <el-table-column label="操作" width="120" fixed="right">
+          <template #default="{ row }">
+            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <!-- 分页 -->
@@ -130,6 +164,20 @@ onMounted(() => {
         style="margin-top: 20px; justify-content: flex-end"
       />
     </el-card>
+
+    <!-- 编辑对话框 -->
+    <el-dialog
+      v-model="dialogVisible"
+      title="编辑用户"
+      width="600px"
+      :close-on-click-modal="false"
+    >
+      <UserForm
+        :user="currentUser"
+        @success="handleEditSuccess"
+        @cancel="handleEditCancel"
+      />
+    </el-dialog>
   </div>
 </template>
 
