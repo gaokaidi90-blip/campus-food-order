@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { getUserProfile, updateUserProfile } from '@/api'
+import { getUserProfile, updateUserProfile, uploadImage } from '@/api'
 import { showToast, showConfirmDialog } from 'vant'
 import type { User } from '@campus-food/shared'
 
@@ -88,13 +88,17 @@ async function handleSave() {
 
   loading.value = true
   try {
-    // 处理头像：如果有上传的文件，转换为 base64；否则保持原头像
+    // 处理头像：如果有上传的文件，先上传到服务器
     let avatarUrl = userInfo.value?.avatar || ''
     if (editForm.value.avatar.length > 0) {
       const file = editForm.value.avatar[0]
-      if (file.content) {
-        // 新上传的文件，使用 base64
-        avatarUrl = file.content
+      if (file.file) {
+        // 新上传的文件，上传到服务器
+        const formData = new FormData()
+        formData.append('file', file.file)
+
+        const uploadRes = await uploadImage(formData, 'avatar')
+        avatarUrl = uploadRes.data.data.url
       }
     }
 
@@ -113,11 +117,10 @@ async function handleSave() {
 }
 
 /**
- * 图片上传后读取为 base64
+ * 图片上传后的回调
  */
 function afterRead(file: any) {
-  // van-uploader 会自动将图片转为 base64 并存储在 file.content 中
-  // 不需要额外处理
+  // van-uploader 会自动处理文件，file.file 包含原始 File 对象
 }
 
 onMounted(() => {
