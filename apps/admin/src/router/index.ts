@@ -71,9 +71,8 @@ router.beforeEach((to) => {
     return '/dashboard'
   }
 
-  // 需要登录但未登录，跳转到统一登录页
+  // 需要登录但未登录，跳转到用户端统一登录页（管理员标签）
   if (requiresAuth && !token) {
-    // 跳转到 user app 的登录页，并带上 redirect 参数
     window.location.href = 'http://localhost:3000/login?redirect=admin'
     return false
   }
