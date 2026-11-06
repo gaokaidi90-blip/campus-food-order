@@ -12,6 +12,7 @@ app.use(createPinia())
 app.use(router)
 app.use(ElementPlus, {
   locale: zhCn,
+  zIndex: 3000, // 设置全局 z-index 起始值
 })
 
 app.mount('#app')
