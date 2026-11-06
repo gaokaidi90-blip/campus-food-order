@@ -267,8 +267,12 @@ onMounted(() => {
 
   .register-button {
     margin-top: 12px;
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.6);
+    color: #fff !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+
+    :deep(.van-button__text) {
+      color: #fff !important;
+    }
 
     &:active {
       background-color: rgba(255, 255, 255, 0.1);
