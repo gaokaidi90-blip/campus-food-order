@@ -277,6 +277,7 @@ onMounted(() => {
 
   .register-button {
     margin-top: 12px;
+    background-color: transparent !important;
     color: #fff !important;
     border-color: rgba(255, 255, 255, 0.8) !important;
 
@@ -285,7 +286,7 @@ onMounted(() => {
     }
 
     &:active {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255, 255, 255, 0.1) !important;
     }
   }
 }
