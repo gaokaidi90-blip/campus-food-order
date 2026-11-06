@@ -45,6 +45,13 @@ export default defineConfig({
   server: {
     port: 3001,
     strictPort: true,
+    // 代理配置：将 /api 请求转发到后端服务
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
   },
   css: {
     preprocessorOptions: {
