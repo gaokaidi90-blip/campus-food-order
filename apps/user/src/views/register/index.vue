@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { register } from '@/api'
 import { useUserStore } from '@/stores/user'
+import { setStorage } from '@/utils/storage'
+import { TOKEN_KEY } from '@campus-food/shared'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -85,9 +87,11 @@ async function handleRegister() {
       password: form.value.password,
     })
 
-    // 保存 token 和用户信息
-    userStore.token = data.data.token
-    userStore.userInfo = data.data.user
+    // 保存 token 和用户信息（使用 .value 赋值）
+    userStore.token.value = data.data.token
+    userStore.userInfo.value = data.data.user
+    // 持久化 token 到 localStorage
+    setStorage(TOKEN_KEY, data.data.token)
 
     showToast.success('注册成功')
 
@@ -118,7 +122,7 @@ function goToLogin() {
     </div>
 
     <van-form @submit="handleRegister">
-      <van-cell-group inset>
+      <van-cell-group inset class="register-form">
         <van-field
           v-model="form.studentId"
           name="studentId"
@@ -195,6 +199,26 @@ function goToLogin() {
     p {
       font-size: 14px;
       opacity: 0.9;
+    }
+  }
+
+  .register-form {
+    background: #fff !important;
+
+    :deep(.van-cell) {
+      background: #fff;
+    }
+
+    :deep(.van-field__label) {
+      color: #323233;
+    }
+
+    :deep(.van-field__control) {
+      color: #323233;
+    }
+
+    :deep(.van-field__control::placeholder) {
+      color: #c8c9cc;
     }
   }
 
