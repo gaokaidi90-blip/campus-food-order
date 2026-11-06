@@ -97,8 +97,13 @@ router.beforeEach((to, _from) => {
   const token = getStorage<string>(TOKEN_KEY)
   const requiresAuth = to.meta.requiresAuth !== false
 
-  // 已登录访问登录页，跳转到首页
+  // 已登录访问登录页
   if (to.path === '/login' && token) {
+    // 如果是管理员登录请求（带 redirect=admin 参数），允许访问
+    if (to.query.redirect === 'admin') {
+      return true
+    }
+    // 否则跳转到首页
     return '/'
   }
 
