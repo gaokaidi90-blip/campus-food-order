@@ -40,10 +40,11 @@ export const useCartStore = defineStore('cart', () => {
   /**
    * 添加到购物车
    * @param dishId 菜品 ID
+   * @param canteenId 食堂 ID
    * @param quantity 数量
    */
-  async function addToCart(dishId: string, quantity: number) {
-    await addCart({ dishId, quantity })
+  async function addToCart(dishId: string, canteenId: string, quantity: number) {
+    await addCart({ dishId, canteenId, quantity })
     await fetchCart() // 重新获取购物车
   }
 

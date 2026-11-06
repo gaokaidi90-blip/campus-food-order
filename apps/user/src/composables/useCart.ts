@@ -11,12 +11,13 @@ export function useCart() {
   /**
    * 添加到购物车
    * @param dishId 菜品 ID
+   * @param canteenId 食堂 ID
    * @param quantity 数量
    * @param showMessage 是否显示提示消息，默认为 true
    */
-  async function addToCart(dishId: string, quantity: number, showMessage = true) {
+  async function addToCart(dishId: string, canteenId: string, quantity: number, showMessage = true) {
     try {
-      await cartStore.addToCart(dishId, quantity)
+      await cartStore.addToCart(dishId, canteenId, quantity)
       if (showMessage) {
         showToast('加入购物车成功')
       }

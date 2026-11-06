@@ -32,7 +32,7 @@ async function fetchDishDetail() {
 async function handleAddToCart() {
   if (!dish.value) return
 
-  const success = await addToCart(dish.value.id, quantity.value)
+  const success = await addToCart(dish.value.id, dish.value.canteenId, quantity.value)
   if (success) {
     router.back()
   }
@@ -45,7 +45,7 @@ async function handleBuyNow() {
   if (!dish.value) return
 
   // 先加入购物车（不显示提示）
-  const success = await addToCart(dish.value.id, quantity.value, false)
+  const success = await addToCart(dish.value.id, dish.value.canteenId, quantity.value, false)
   if (success) {
     // 获取刚添加的购物车项ID，跳转到结算页面
     const { useCartStore } = await import('@/stores/cart')

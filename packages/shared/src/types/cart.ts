@@ -22,6 +22,7 @@ export interface CartItem {
  */
 export interface AddCartReq {
   dishId: string
+  canteenId: string
   quantity: number
 }
 
