@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getStorage } from '@/utils/storage'
+import { getStorage, setStorage } from '@/utils/storage'
 import { ADMIN_TOKEN_KEY } from '@campus-food/shared'
 
 const router = createRouter({
@@ -63,6 +63,19 @@ const router = createRouter({
  * 验证管理员登录状态
  */
 router.beforeEach((to) => {
+  // 如果 URL 中包含 token 参数，保存到 localStorage
+  if (to.query.token && typeof to.query.token === 'string') {
+    console.log('从 URL 获取到 token，保存到 localStorage')
+    setStorage(ADMIN_TOKEN_KEY, to.query.token)
+    // 移除 URL 中的 token 参数，重定向到干净的 URL
+    const { token, ...restQuery } = to.query
+    return {
+      path: to.path,
+      query: restQuery,
+      replace: true,
+    }
+  }
+
   const token = getStorage<string>(ADMIN_TOKEN_KEY)
   const requiresAuth = to.meta.requiresAuth !== false
 

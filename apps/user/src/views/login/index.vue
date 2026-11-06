@@ -76,16 +76,26 @@ async function handleAdminLogin() {
       password: adminForm.value.password,
     })
 
-    // 保存管理员 token
-    setStorage(ADMIN_TOKEN_KEY, data.data.token)
+    console.log('管理员登录成功，token:', data.data.token)
+
+    const token = data.data.token
+
+    // 保存管理员 token 到当前域（用户端）
+    setStorage(ADMIN_TOKEN_KEY, token)
+
+    console.log('Token 已保存，准备跳转到管理后台')
 
     showToast('登录成功')
 
-    // 跳转到管理后台
+    // 跳转到管理后台，通过 URL 参数传递 token
+    // 管理端会从 URL 读取 token 并保存到自己的 localStorage
     setTimeout(() => {
-      window.location.href = 'http://localhost:3001/dashboard'
+      const targetUrl = `http://localhost:3001/dashboard?token=${encodeURIComponent(token)}`
+      console.log('开始跳转到:', targetUrl)
+      window.location.href = targetUrl
     }, 500)
   } catch (error) {
+    console.error('管理员登录失败:', error)
     showToast('用户名或密码错误')
   } finally {
     loading.value = false
