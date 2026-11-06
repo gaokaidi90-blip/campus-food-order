@@ -93,14 +93,14 @@ async function handleRegister() {
     // 持久化 token 到 localStorage
     setStorage(TOKEN_KEY, data.data.token)
 
-    showToast.success('注册成功')
+    showToast({ type: 'success', message: '注册成功' })
 
     // 跳转到首页
     setTimeout(() => {
       router.replace('/')
     }, 1000)
   } catch (err: any) {
-    showToast.fail(err.message || '注册失败')
+    showToast({ type: 'fail', message: err.message || '注册失败' })
   } finally {
     loading.value = false
   }
