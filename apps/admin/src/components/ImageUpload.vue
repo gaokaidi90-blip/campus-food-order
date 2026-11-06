@@ -2,19 +2,25 @@
 import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadProps } from 'element-plus'
+import { uploadImage } from '@/api/modules/upload'
 
 interface Props {
   modelValue: string
+  // 上传类型：avatar | dish | canteen
+  type?: 'avatar' | 'dish' | 'canteen'
 }
 
 interface Emits {
   (e: 'update:modelValue', value: string): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  type: 'dish',
+})
 const emit = defineEmits<Emits>()
 
 const imageUrl = ref(props.modelValue)
+const uploading = ref(false)
 
 // 监听 props 变化
 watch(
@@ -46,17 +52,29 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
 }
 
 /**
- * 处理图片上传（转为 base64）
+ * 处理图片上传（上传到后端服务器）
  */
-const handleChange: UploadProps['onChange'] = (uploadFile) => {
+const handleChange: UploadProps['onChange'] = async (uploadFile) => {
   if (uploadFile.raw) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const base64 = e.target?.result as string
-      imageUrl.value = base64
-      emit('update:modelValue', base64)
+    uploading.value = true
+    try {
+      // 构造 FormData
+      const formData = new FormData()
+      formData.append('file', uploadFile.raw)
+
+      // 上传到后端
+      const res = await uploadImage(formData, props.type)
+      const url = res.data.url
+
+      // 更新图片 URL
+      imageUrl.value = url
+      emit('update:modelValue', url)
+      ElMessage.success('上传成功')
+    } catch (error: any) {
+      ElMessage.error(error.message || '上传失败')
+    } finally {
+      uploading.value = false
     }
-    reader.readAsDataURL(uploadFile.raw)
   }
 }
 </script>
@@ -69,14 +87,18 @@ const handleChange: UploadProps['onChange'] = (uploadFile) => {
       :show-file-list="false"
       :before-upload="beforeUpload"
       :on-change="handleChange"
+      :disabled="uploading"
       accept="image/*"
     >
       <img v-if="imageUrl" :src="imageUrl" class="uploaded-image" />
       <div v-else class="upload-placeholder">
-        <el-icon class="upload-icon">
+        <el-icon v-if="uploading" class="is-loading upload-icon">
+          <i-ep-loading />
+        </el-icon>
+        <el-icon v-else class="upload-icon">
           <i-ep-plus />
         </el-icon>
-        <div class="upload-text">点击上传图片</div>
+        <div class="upload-text">{{ uploading ? '上传中...' : '点击上传图片' }}</div>
       </div>
     </el-upload>
     <div class="upload-tip">支持 jpg、png、gif 格式，大小不超过 2MB</div>

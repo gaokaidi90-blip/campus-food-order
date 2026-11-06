@@ -45,6 +45,7 @@ declare module 'vue' {
     IEpFold: typeof import('~icons/ep/fold')['default']
     IEpFood: typeof import('~icons/ep/food')['default']
     IEpList: typeof import('~icons/ep/list')['default']
+    IEpLoading: typeof import('~icons/ep/loading')['default']
     IEpMenu: typeof import('~icons/ep/menu')['default']
     IEpMoney: typeof import('~icons/ep/money')['default']
     IEpOdometer: typeof import('~icons/ep/odometer')['default']
