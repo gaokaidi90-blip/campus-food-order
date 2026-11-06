@@ -104,6 +104,13 @@ function handleLogin() {
 }
 
 /**
+ * 前往注册页
+ */
+function goToRegister() {
+  router.push('/register')
+}
+
+/**
  * 检查 URL 参数，自动切换到管理员登录
  */
 onMounted(() => {
@@ -157,6 +164,9 @@ onMounted(() => {
           :loading="loading"
         >
           登录
+        </van-button>
+        <van-button round block plain @click="goToRegister" class="register-button">
+          还没有账号？立即注册
         </van-button>
       </div>
 
@@ -254,6 +264,16 @@ onMounted(() => {
 
 .login-button {
   margin: 30px 16px 0;
+
+  .register-button {
+    margin-top: 12px;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.6);
+
+    &:active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
 }
 
 .login-tip {

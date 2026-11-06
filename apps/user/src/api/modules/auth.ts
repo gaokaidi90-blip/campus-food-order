@@ -2,6 +2,18 @@ import type { User, UserLoginReq, UserLoginRes, Admin } from '@campus-food/share
 import { post, get } from '@/utils/request'
 
 /**
+ * 用户注册
+ */
+export function register(data: {
+  studentId: string
+  name: string
+  phone: string
+  password: string
+}) {
+  return post<UserLoginRes>('/user/register', data)
+}
+
+/**
  * 用户登录
  */
 export function login(data: UserLoginReq) {
