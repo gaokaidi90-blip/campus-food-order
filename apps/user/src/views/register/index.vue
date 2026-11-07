@@ -17,9 +17,55 @@ const form = ref({
   phone: '',
   password: '',
   confirmPassword: '',
+  captcha: '',
 })
 
 const loading = ref(false)
+
+// 验证码相关
+const countdown = ref(0)
+const captchaText = ref('获取验证码')
+
+/**
+ * 获取验证码（防抖：60秒倒计时）
+ */
+function getCaptcha() {
+  // 验证手机号
+  if (!form.value.phone) {
+    showToast('请先输入手机号')
+    return
+  }
+
+  const phoneReg = /^1[3-9]\d{9}$/
+  if (!phoneReg.test(form.value.phone)) {
+    showToast('请输入正确的手机号')
+    return
+  }
+
+  // 防抖：正在倒计时中，不允许重复点击
+  if (countdown.value > 0) {
+    return
+  }
+
+  // 显示验证码提示
+  showToast({
+    type: 'success',
+    message: '验证码为：123456',
+    duration: 3000,
+  })
+
+  // 开始倒计时
+  countdown.value = 60
+  const timer = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(timer)
+      captchaText.value = '获取验证码'
+    } else {
+      captchaText.value = `${countdown.value}秒后重试`
+    }
+  }, 1000)
+}
 
 /**
  * 表单验证
@@ -44,6 +90,17 @@ function validateForm(): boolean {
   const phoneReg = /^1[3-9]\d{9}$/
   if (!phoneReg.test(form.value.phone)) {
     showToast('请输入正确的手机号')
+    return false
+  }
+
+  // 验证验证码
+  if (!form.value.captcha) {
+    showToast('请输入验证码')
+    return false
+  }
+
+  if (form.value.captcha !== '123456') {
+    showToast('验证码错误')
     return false
   }
 
@@ -145,6 +202,24 @@ function goToLogin() {
           placeholder="请输入手机号"
           :rules="[{ required: true, message: '请输入手机号' }]"
         />
+        <van-field
+          v-model="form.captcha"
+          name="captcha"
+          label="验证码"
+          placeholder="请输入验证码"
+          :rules="[{ required: true, message: '请输入验证码' }]"
+        >
+          <template #button>
+            <van-button
+              size="small"
+              type="primary"
+              :disabled="countdown > 0"
+              @click="getCaptcha"
+            >
+              {{ captchaText }}
+            </van-button>
+          </template>
+        </van-field>
         <van-field
           v-model="form.password"
           name="password"
