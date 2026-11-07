@@ -140,15 +140,24 @@ async function handleCancel() {
       </div>
       <div class="info-row">
         <span class="label">收货人：</span>
-        <span>{{ order.address?.name }} {{ order.address?.phone }}</span>
+        <span>{{ order.address?.name }}</span>
       </div>
       <div class="info-row">
-        <span class="label">地址：</span>
-        <span>{{ order.address?.address }}</span>
+        <span class="label">联系电话：</span>
+        <a :href="`tel:${order.address?.phone}`" class="phone-link">
+          {{ order.address?.phone }}
+        </a>
+      </div>
+      <div class="info-row">
+        <span class="label">配送地址：</span>
+        <span class="address-detail">
+          {{ order.address?.building }} {{ order.address?.room }}
+          <span v-if="order.address?.address" class="address-extra">（{{ order.address.address }}）</span>
+        </span>
       </div>
       <div v-if="order.remark" class="info-row">
         <span class="label">备注：</span>
-        <span>{{ order.remark }}</span>
+        <span class="remark-text">{{ order.remark }}</span>
       </div>
     </div>
 
@@ -242,6 +251,36 @@ async function handleCancel() {
       .label {
         color: #909399;
         margin-right: 8px;
+      }
+
+      .phone-link {
+        color: #409eff;
+        font-weight: bold;
+        font-size: 15px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 0.3s;
+
+        &:hover {
+          color: #66b1ff;
+          text-decoration: underline;
+        }
+      }
+
+      .address-detail {
+        font-weight: 500;
+        color: #303133;
+
+        .address-extra {
+          color: #909399;
+          font-weight: normal;
+          font-size: 13px;
+        }
+      }
+
+      .remark-text {
+        color: #e6a23c;
+        font-style: italic;
       }
     }
   }
