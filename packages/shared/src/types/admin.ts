@@ -8,6 +8,7 @@ export interface Admin {
   name: string
   phone: string
   role: 'admin' | 'superadmin'
+  canteenId: number | null // NULL 表示超级管理员，可管理所有食堂
   avatar?: string
   createdAt: string
   updatedAt: string
