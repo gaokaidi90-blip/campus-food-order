@@ -25,14 +25,17 @@ const canteens = ref<Canteen[]>([])
 const form = ref({
   canteenId: '',
   name: '',
-  sort: 0,
+  sort: 1,
 })
 
 // 表单验证规则
 const rules: FormRules = {
   canteenId: [{ required: true, message: '请选择所属食堂', trigger: 'change' }],
   name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }],
-  sort: [{ required: true, message: '请输入排序号', trigger: 'blur' }],
+  sort: [
+    { required: true, message: '请输入排序号', trigger: 'blur' },
+    { type: 'number', min: 1, message: '排序号必须从1开始', trigger: 'blur' },
+  ],
 }
 
 /**

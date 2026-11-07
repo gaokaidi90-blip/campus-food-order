@@ -22,14 +22,9 @@ const dialogTitle = ref('')
 const currentCategory = ref<Category | null>(null)
 
 /**
- * 加载食堂列表（用于筛选）
+ * 加载食堂列表（用于筛选和显示）
  */
 async function loadCanteens() {
-  // 超级管理员才需要加载食堂列表
-  if (!adminStore.isSuperAdmin) {
-    return
-  }
-
   try {
     const { data } = await getCanteenList()
     canteens.value = data.data.list
