@@ -145,11 +145,12 @@ onMounted(() => {
             {{ new Date(row.createdAt).toLocaleString() }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120" fixed="right">
+        <!-- 用户管理改为只读，移除操作列 -->
+        <!-- <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
 
       <!-- 分页 -->
@@ -165,8 +166,8 @@ onMounted(() => {
       />
     </el-card>
 
-    <!-- 编辑对话框 -->
-    <el-dialog
+    <!-- 编辑对话框已移除：用户管理改为只读 -->
+    <!-- <el-dialog
       v-model="dialogVisible"
       title="编辑用户"
       width="600px"
@@ -177,7 +178,7 @@ onMounted(() => {
         @success="handleEditSuccess"
         @cancel="handleEditCancel"
       />
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 

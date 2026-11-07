@@ -4,7 +4,9 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getCategoryList, deleteCategory, getCanteenList } from '@/api'
 import type { Category, Canteen } from '@campus-food/shared'
 import CategoryForm from './components/CategoryForm.vue'
+import { useAdminStore } from '@/stores/admin'
 
+const adminStore = useAdminStore()
 const loading = ref(false)
 const categories = ref<Category[]>([])
 const canteens = ref<Canteen[]>([])
@@ -23,6 +25,11 @@ const currentCategory = ref<Category | null>(null)
  * 加载食堂列表（用于筛选）
  */
 async function loadCanteens() {
+  // 超级管理员才需要加载食堂列表
+  if (!adminStore.isSuperAdmin) {
+    return
+  }
+
   try {
     const { data } = await getCanteenList()
     canteens.value = data.data.list
@@ -37,12 +44,18 @@ async function loadCanteens() {
 async function loadCategories() {
   loading.value = true
   try {
-    const { data } = await getCategoryList({
-      canteenId: canteenId.value,
+    const params: any = {
       keyword: keyword.value,
       page: currentPage.value,
       pageSize: pageSize.value,
-    })
+    }
+
+    // 超级管理员才传递 canteenId 参数，食堂管理员由后端自动过滤
+    if (adminStore.isSuperAdmin) {
+      params.canteenId = canteenId.value
+    }
+
+    const { data } = await getCategoryList(params)
     categories.value = data.data.list
     total.value = data.data.total
   } catch (error) {
@@ -161,6 +174,7 @@ onMounted(() => {
       <div class="toolbar">
         <div class="search-bar">
           <el-select
+            v-if="adminStore.isSuperAdmin"
             v-model="canteenId"
             placeholder="选择食堂"
             clearable
