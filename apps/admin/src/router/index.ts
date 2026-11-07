@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getStorage, setStorage } from '@/utils/storage'
 import { ADMIN_TOKEN_KEY } from '@campus-food/shared'
+import { useAdminStore } from '@/stores/admin'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,7 +28,7 @@ const router = createRouter({
           path: 'canteen',
           name: 'canteen',
           component: () => import('@/views/canteen/index.vue'),
-          meta: { requiresAuth: true },
+          meta: { requiresAuth: true, requiresSuperAdmin: true },
         },
         {
           path: 'category',
@@ -60,7 +61,7 @@ const router = createRouter({
 
 /**
  * 路由守卫
- * 验证管理员登录状态
+ * 验证管理员登录状态和权限
  */
 router.beforeEach((to) => {
   // 如果 URL 中包含 token 参数，保存到 localStorage
@@ -88,6 +89,15 @@ router.beforeEach((to) => {
   if (requiresAuth && !token) {
     window.location.href = 'http://localhost:3000/login?redirect=admin'
     return false
+  }
+
+  // 超级管理员权限检查
+  if (to.meta.requiresSuperAdmin) {
+    const adminStore = useAdminStore()
+    if (!adminStore.isSuperAdmin) {
+      // 非超级管理员访问超级管理员专属页面，跳转到首页
+      return '/dashboard'
+    }
   }
 
   // 其他情况放行

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Admin } from '@campus-food/shared'
 import { ADMIN_TOKEN_KEY } from '@campus-food/shared'
 import { setStorage, getStorage, removeStorage } from '@/utils/storage'
@@ -12,6 +12,16 @@ import { login as loginApi } from '@/api'
 export const useAdminStore = defineStore('admin', () => {
   // 管理员信息
   const adminInfo = ref<Omit<Admin, 'password'> | null>(null)
+
+  /**
+   * 是否为超级管理员
+   */
+  const isSuperAdmin = computed(() => adminInfo.value?.role === 'superadmin')
+
+  /**
+   * 当前管理员关联的食堂 ID
+   */
+  const canteenId = computed(() => adminInfo.value?.canteenId)
 
   /**
    * 登录
@@ -47,6 +57,8 @@ export const useAdminStore = defineStore('admin', () => {
 
   return {
     adminInfo,
+    isSuperAdmin,
+    canteenId,
     login,
     logout,
     isLoggedIn,

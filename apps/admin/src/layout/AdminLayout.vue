@@ -47,7 +47,7 @@ function handleLogout() {
           <template #title>数据看板</template>
         </el-menu-item>
 
-        <el-menu-item index="/canteen">
+        <el-menu-item v-if="adminStore.isSuperAdmin" index="/canteen">
           <el-icon><i-ep-shop /></el-icon>
           <template #title>食堂管理</template>
         </el-menu-item>

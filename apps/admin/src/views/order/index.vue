@@ -5,7 +5,9 @@ import { getOrderList, getCanteenList } from '@/api'
 import { OrderStatus, OrderStatusLabel } from '@campus-food/shared'
 import type { Order, Canteen } from '@campus-food/shared'
 import OrderCard from './components/OrderCard.vue'
+import { useAdminStore } from '@/stores/admin'
 
+const adminStore = useAdminStore()
 const loading = ref(false)
 const orders = ref<Order[]>([])
 const canteens = ref<Canteen[]>([])
@@ -27,6 +29,11 @@ const statusOptions = [
  * 加载食堂列表（用于筛选）
  */
 async function loadCanteens() {
+  // 超级管理员才需要加载食堂列表
+  if (!adminStore.isSuperAdmin) {
+    return
+  }
+
   try {
     const { data } = await getCanteenList()
     canteens.value = data.data.list
@@ -41,12 +48,18 @@ async function loadCanteens() {
 async function loadOrders() {
   loading.value = true
   try {
-    const { data } = await getOrderList({
-      canteenId: canteenId.value,
+    const params: any = {
       status: status.value,
       page: currentPage.value,
       pageSize: pageSize.value,
-    })
+    }
+
+    // 超级管理员才传递 canteenId 参数，食堂管理员由后端自动过滤
+    if (adminStore.isSuperAdmin) {
+      params.canteenId = canteenId.value
+    }
+
+    const { data } = await getOrderList(params)
     orders.value = data.data.list
     total.value = data.data.total
   } catch (error) {
@@ -111,6 +124,7 @@ onMounted(() => {
       <div class="toolbar">
         <div class="search-bar">
           <el-select
+            v-if="adminStore.isSuperAdmin"
             v-model="canteenId"
             placeholder="选择食堂"
             clearable
