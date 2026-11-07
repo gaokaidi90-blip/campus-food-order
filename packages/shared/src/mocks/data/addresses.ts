@@ -1,6 +1,16 @@
-import type { Address } from '@campus-food/shared'
+import { loadFromStorage, saveToStorage } from './storage'
+import type { Address } from '../../types'
+
+const initialAddresses: Address[] = []
 
 /**
- * 地址数据 (内存存储)
+ * 地址数据 (localStorage 持久化)
  */
-export const addresses: Address[] = []
+export let addresses = loadFromStorage('mock_addresses', initialAddresses)
+
+/**
+ * 保存地址数据到 localStorage
+ */
+export function saveAddresses() {
+  saveToStorage('mock_addresses', addresses)
+}

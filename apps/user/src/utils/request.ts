@@ -9,7 +9,9 @@ import { TOKEN_KEY } from '@campus-food/shared'
  * 配置基础 URL 和超时时间
  */
 const request: AxiosInstance = axios.create({
-  baseURL: '/api', // API 基础路径
+  // Use the backend directly during local development; Vite's /api fallback
+  // can otherwise return index.html when its proxy target is unavailable.
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api',
   timeout: 10000, // 请求超时时间 10 秒
 })
 
@@ -38,7 +40,19 @@ request.interceptors.request.use(
  */
 request.interceptors.response.use(
   (response: AxiosResponse<Res<unknown>>) => {
-    const { code, message } = response.data
+    const payload: unknown = response.data
+
+    // Vite may return the SPA's index.html when the API proxy cannot reach
+    // the backend. Report that as a transport/configuration problem instead
+    // of misleadingly treating it as an API business error.
+    if (!payload || typeof payload !== 'object' || !('code' in payload)) {
+      const contentType = response.headers['content-type'] || 'unknown content type'
+      const message = `接口返回了非 JSON 数据（${contentType}），请检查后端服务及代理配置`
+      console.error('Invalid API Response:', message)
+      return Promise.reject(new Error(message))
+    }
+
+    const { code, message } = payload as Res<unknown>
 
     // code 200 表示请求成功
     if (code === 200) {
