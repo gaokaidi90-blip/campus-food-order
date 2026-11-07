@@ -1,41 +1,151 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getDashboardStats } from '@/api'
+import {
+  getDashboardStats,
+  getOrderTrend,
+  getRevenueTrend,
+  getOrderStatusDistribution,
+  getTopDishes,
+  getCanteenComparison,
+} from '@/api'
+import type {
+  DashboardStats,
+  TrendData,
+  StatusDistribution,
+  DishRank,
+  CanteenStats,
+} from '@/api'
 import { ElMessage } from 'element-plus'
+import { useAdminStore } from '@/stores/admin'
+import OrderTrendChart from './components/OrderTrendChart.vue'
+import RevenueTrendChart from './components/RevenueTrendChart.vue'
+import StatusPieChart from './components/StatusPieChart.vue'
+import DishRankChart from './components/DishRankChart.vue'
+import CanteenCompareChart from './components/CanteenCompareChart.vue'
+
+const adminStore = useAdminStore()
 
 // 统计数据
-const stats = ref({
+const stats = ref<DashboardStats>({
   totalOrders: 0,
   todayOrders: 0,
   totalRevenue: 0,
   todayRevenue: 0,
 })
 
+// 图表数据
+const orderTrendData = ref<TrendData[]>([])
+const revenueTrendData = ref<TrendData[]>([])
+const statusData = ref<StatusDistribution[]>([])
+const dishRankData = ref<DishRank[]>([])
+const canteenData = ref<CanteenStats[]>([])
+
 const loading = ref(false)
 
 /**
- * 加载统计数据
+ * 加载基础统计数据
  */
-async function fetchStats() {
-  loading.value = true
+async function loadBasicStats() {
   try {
     const { data } = await getDashboardStats()
     stats.value = data.data
   } catch (error) {
+    console.error('加载统计数据失败:', error)
     ElMessage.error('加载统计数据失败')
-  } finally {
-    loading.value = false
   }
 }
 
+/**
+ * 加载所有图表数据
+ */
+async function loadChartsData() {
+  // 订单趋势
+  try {
+    const { data } = await getOrderTrend(7)
+    orderTrendData.value = data.data
+  } catch (error) {
+    console.error('加载订单趋势失败:', error)
+    orderTrendData.value = []
+  }
+
+  // 营业额趋势
+  try {
+    const { data } = await getRevenueTrend(7)
+    revenueTrendData.value = data.data
+  } catch (error) {
+    console.error('加载营业额趋势失败:', error)
+    revenueTrendData.value = []
+  }
+
+  // 订单状态分布
+  try {
+    const { data } = await getOrderStatusDistribution()
+    statusData.value = data.data
+  } catch (error) {
+    console.error('加载订单状态分布失败:', error)
+    statusData.value = []
+  }
+
+  // 热销菜品排行
+  try {
+    const { data } = await getTopDishes(10)
+    dishRankData.value = data.data
+  } catch (error) {
+    console.error('加载热销菜品失败:', error)
+    dishRankData.value = []
+  }
+
+  // 食堂对比（仅超级管理员）
+  if (adminStore.isSuperAdmin) {
+    try {
+      const { data } = await getCanteenComparison()
+      canteenData.value = data.data
+    } catch (error) {
+      console.error('加载食堂对比失败:', error)
+      canteenData.value = []
+    }
+  }
+}
+
+/**
+ * 加载所有数据
+ */
+async function fetchAllData() {
+  loading.value = true
+
+  // 先加载基础统计
+  await loadBasicStats()
+  loading.value = false
+
+  // 后台加载图表数据
+  loadChartsData()
+}
+
+/**
+ * 刷新数据
+ */
+function handleRefresh() {
+  fetchAllData()
+  ElMessage.success('数据刷新中...')
+}
+
 onMounted(() => {
-  fetchStats()
+  fetchAllData()
 })
 </script>
 
 <template>
-  <div class="dashboard-container" v-loading="loading">
-    <el-row :gutter="20">
+  <div class="dashboard-container">
+    <!-- 顶部操作栏 -->
+    <div class="toolbar">
+      <h2>数据看板</h2>
+      <el-button type="primary" :icon="'Refresh'" @click="handleRefresh">
+        刷新数据
+      </el-button>
+    </div>
+
+    <!-- 统计卡片 -->
+    <el-row :gutter="20" v-loading="loading">
       <el-col :span="6">
         <el-card shadow="hover">
           <div class="stat-card">
@@ -93,13 +203,59 @@ onMounted(() => {
       </el-col>
     </el-row>
 
+    <!-- 图表区域 -->
     <el-row :gutter="20" style="margin-top: 20px">
+      <!-- 订单趋势 -->
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <template #header>
+            <span>订单趋势（近7天）</span>
+          </template>
+          <OrderTrendChart :data="orderTrendData" />
+        </el-card>
+      </el-col>
+
+      <!-- 营业额趋势 -->
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <template #header>
+            <span>营业额趋势（近7天）</span>
+          </template>
+          <RevenueTrendChart :data="revenueTrendData" />
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-row :gutter="20" style="margin-top: 20px">
+      <!-- 订单状态分布 -->
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <template #header>
+            <span>订单状态分布</span>
+          </template>
+          <StatusPieChart :data="statusData" />
+        </el-card>
+      </el-col>
+
+      <!-- 热销菜品排行 -->
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <template #header>
+            <span>热销菜品 Top 10</span>
+          </template>
+          <DishRankChart :data="dishRankData" />
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 食堂对比（仅超级管理员） -->
+    <el-row v-if="adminStore.isSuperAdmin" :gutter="20" style="margin-top: 20px">
       <el-col :span="24">
         <el-card shadow="hover">
           <template #header>
-            <span>欢迎使用校园点餐管理系统</span>
+            <span>食堂数据对比</span>
           </template>
-          <el-empty description="数据统计功能开发中..." />
+          <CanteenCompareChart :data="canteenData" />
         </el-card>
       </el-col>
     </el-row>
@@ -108,6 +264,20 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .dashboard-container {
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #303133;
+    }
+  }
+
   .stat-card {
     display: flex;
     align-items: center;
