@@ -21,7 +21,7 @@ function toggleCollapse() {
  */
 function handleLogout() {
   adminStore.logout()
-  router.replace('/login')
+  window.location.href = 'http://localhost:3000/login?redirect=admin'
 }
 </script>
 

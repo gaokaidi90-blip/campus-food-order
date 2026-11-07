@@ -12,13 +12,7 @@ export function useAuth() {
    * 登录
    */
   async function login(studentId: string, password: string) {
-    try {
-      await userStore.login(studentId, password)
-      return true
-    } catch (error) {
-      console.error('Login failed:', error)
-      return false
-    }
+    await userStore.login(studentId, password)
   }
 
   /**

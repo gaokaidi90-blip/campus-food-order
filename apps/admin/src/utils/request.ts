@@ -10,7 +10,9 @@ import { ElMessage } from 'element-plus'
  * 配置基础 URL 和超时时间
  */
 const request: AxiosInstance = axios.create({
-  baseURL: '/api', // API 基础路径
+  // Use Vite's same-origin /api proxy in development to avoid backend CORS
+  // allowlist mismatches between the user and admin app origins.
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 10000, // 请求超时时间 10 秒
 })
 

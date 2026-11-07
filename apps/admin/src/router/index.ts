@@ -9,7 +9,17 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('@/views/login/index.vue'),
+      // Keep the legacy URL working, but send it to the shared login app.
+      component: () => import('@/views/dashboard/index.vue'),
+      beforeEnter: (to) => {
+        const loginUrl = new URL('http://localhost:3000/login')
+        loginUrl.searchParams.set('redirect', 'admin')
+        if (typeof to.query.returnTo === 'string') {
+          loginUrl.searchParams.set('returnTo', to.query.returnTo)
+        }
+        window.location.href = loginUrl.toString()
+        return false
+      },
       meta: { requiresAuth: false },
     },
     {
@@ -82,12 +92,15 @@ router.beforeEach((to) => {
 
   // 已登录访问登录页，跳转到首页
   if (to.path === '/login' && token) {
-    return '/dashboard'
+    return typeof to.query.returnTo === 'string' ? to.query.returnTo : '/dashboard'
   }
 
   // 需要登录但未登录，跳转到用户端统一登录页（管理员标签）
   if (requiresAuth && !token) {
-    window.location.href = 'http://localhost:3000/login?redirect=admin'
+    const loginUrl = new URL('http://localhost:3000/login')
+    loginUrl.searchParams.set('redirect', 'admin')
+    loginUrl.searchParams.set('returnTo', to.fullPath)
+    window.location.href = loginUrl.toString()
     return false
   }
 

@@ -9,9 +9,9 @@ import { TOKEN_KEY } from '@campus-food/shared'
  * 配置基础 URL 和超时时间
  */
 const request: AxiosInstance = axios.create({
-  // Use the backend directly during local development; Vite's /api fallback
-  // can otherwise return index.html when its proxy target is unavailable.
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api',
+  // Use Vite's same-origin /api proxy in development to avoid backend CORS
+  // allowlist mismatches between the user and admin app origins.
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 10000, // 请求超时时间 10 秒
 })
 
@@ -21,9 +21,13 @@ const request: AxiosInstance = axios.create({
  */
 request.interceptors.request.use(
   (config) => {
-    // 从本地存储获取 token
+    // Login and registration are public endpoints. Do not send a stale token
+    // from another session or account with these requests.
+    const publicAuthRequest = /\/(user\/(login|register)|admin\/login)$/.test(
+      config.url || ''
+    )
     const token = getStorage<string>(TOKEN_KEY)
-    if (token) {
+    if (token && !publicAuthRequest) {
       // 将 token 添加到请求头
       config.headers.Authorization = `Bearer ${token}`
     }

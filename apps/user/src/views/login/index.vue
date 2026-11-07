@@ -30,6 +30,19 @@ const adminForm = ref({
 
 const loading = ref(false)
 
+function getLoginErrorMessage(error: unknown, fallback: string) {
+  const responseMessage = (error as { response?: { data?: { message?: unknown } } })
+    ?.response?.data?.message
+  if (typeof responseMessage === 'string' && responseMessage) return responseMessage
+  if (error instanceof Error && error.message && error.message !== 'Network Error') {
+    return error.message
+  }
+  if (error instanceof Error && error.message === 'Network Error') {
+    return '网络连接失败，请检查后端服务和网络'
+  }
+  return fallback
+}
+
 /**
  * 处理学生登录
  */
@@ -44,14 +57,15 @@ async function handleUserLogin() {
   }
 
   loading.value = true
-  const success = await login(studentForm.value.studentId, studentForm.value.password)
-  loading.value = false
-
-  if (success) {
+  try {
+    await login(studentForm.value.studentId, studentForm.value.password)
     showToast('登录成功')
     router.push('/')
-  } else {
-    showToast('学号或密码错误')
+  } catch (error) {
+    console.error('学生登录失败:', error)
+    showToast(getLoginErrorMessage(error, '登录失败，请稍后重试'))
+  } finally {
+    loading.value = false
   }
 }
 
@@ -90,13 +104,18 @@ async function handleAdminLogin() {
     // 跳转到管理后台，通过 URL 参数传递 token
     // 管理端会从 URL 读取 token 并保存到自己的 localStorage
     setTimeout(() => {
-      const targetUrl = `http://localhost:3001/dashboard?token=${encodeURIComponent(token)}`
+      const returnTo = typeof route.query.returnTo === 'string'
+        && route.query.returnTo.startsWith('/')
+        && !route.query.returnTo.startsWith('//')
+        ? route.query.returnTo
+        : '/dashboard'
+      const targetUrl = `http://localhost:3001${returnTo}?token=${encodeURIComponent(token)}`
       console.log('开始跳转到:', targetUrl)
       window.location.href = targetUrl
     }, 500)
   } catch (error) {
     console.error('管理员登录失败:', error)
-    showToast('用户名或密码错误')
+    showToast(getLoginErrorMessage(error, '登录失败，请稍后重试'))
   } finally {
     loading.value = false
   }
