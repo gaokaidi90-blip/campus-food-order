@@ -105,9 +105,11 @@ watch(
         name: newVal.name,
         description: newVal.description,
         image: newVal.image,
-        price: newVal.price,
-        originalPrice: newVal.originalPrice || 0,
-        stock: newVal.stock,
+        // MySQL DECIMAL values may arrive as strings; normalize numeric form
+        // fields so Element Plus number validation sees actual numbers.
+        price: Number(newVal.price),
+        originalPrice: Number(newVal.originalPrice) || 0,
+        stock: Number(newVal.stock),
         status: newVal.status,
         specifications: newVal.specifications || '',
       }

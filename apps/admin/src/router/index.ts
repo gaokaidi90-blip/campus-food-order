@@ -78,8 +78,28 @@ router.beforeEach((to) => {
   if (to.query.token && typeof to.query.token === 'string') {
     console.log('从 URL 获取到 token，保存到 localStorage')
     setStorage(ADMIN_TOKEN_KEY, to.query.token)
+    const adminStore = useAdminStore()
+    const role = to.query.adminRole
+    const adminId = to.query.adminId
+    const username = to.query.adminUsername
+    if (
+      (role === 'admin' || role === 'superadmin') &&
+      typeof adminId === 'string' &&
+      typeof username === 'string'
+    ) {
+      adminStore.adminInfo = {
+        id: adminId,
+        username,
+        name: username,
+        phone: '',
+        role,
+        canteenId: typeof to.query.canteenId === 'string' ? Number(to.query.canteenId) : null,
+        createdAt: '',
+        updatedAt: '',
+      }
+    }
     // 移除 URL 中的 token 参数，重定向到干净的 URL
-    const { token, ...restQuery } = to.query
+    const { token, adminRole, adminId: _adminId, adminUsername, canteenId, ...restQuery } = to.query
     return {
       path: to.path,
       query: restQuery,
@@ -88,6 +108,10 @@ router.beforeEach((to) => {
   }
 
   const token = getStorage<string>(ADMIN_TOKEN_KEY)
+  const adminStore = useAdminStore()
+  if (token) {
+    adminStore.restoreFromToken()
+  }
   const requiresAuth = to.meta.requiresAuth !== false
 
   // 已登录访问登录页，跳转到首页
@@ -106,7 +130,6 @@ router.beforeEach((to) => {
 
   // 超级管理员权限检查
   if (to.meta.requiresSuperAdmin) {
-    const adminStore = useAdminStore()
     if (!adminStore.isSuperAdmin) {
       // 非超级管理员访问超级管理员专属页面，跳转到首页
       return '/dashboard'

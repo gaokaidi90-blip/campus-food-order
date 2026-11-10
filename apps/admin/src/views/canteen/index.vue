@@ -153,6 +153,18 @@ onMounted(() => {
       <!-- 食堂列表 -->
       <el-table :data="canteens" :loading="loading" style="width: 100%">
         <el-table-column type="index" label="序号" width="80" :index="indexMethod" />
+        <el-table-column label="图片" width="100">
+          <template #default="{ row }">
+            <el-image
+              :src="row.image"
+              style="width: 60px; height: 60px; border-radius: 4px"
+              fit="cover"
+              :preview-src-list="row.image ? [row.image] : []"
+              :preview-teleported="true"
+              :z-index="4000"
+            />
+          </template>
+        </el-table-column>
         <el-table-column prop="name" label="食堂名称" width="200" />
         <el-table-column prop="description" label="描述" />
         <el-table-column prop="location" label="位置" width="200" />

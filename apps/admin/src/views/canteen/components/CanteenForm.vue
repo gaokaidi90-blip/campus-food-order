@@ -126,7 +126,7 @@ function handleCancel() {
     </el-form-item>
 
     <el-form-item label="食堂图片" prop="image">
-      <ImageUpload v-model="form.image" />
+      <ImageUpload v-model="form.image" type="canteen" />
     </el-form-item>
 
     <el-form-item label="状态" prop="status">

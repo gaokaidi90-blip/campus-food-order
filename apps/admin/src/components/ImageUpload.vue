@@ -64,7 +64,7 @@ const handleChange: UploadProps['onChange'] = async (uploadFile) => {
 
       // 上传到后端
       const res = await uploadImage(formData, props.type)
-      const url = res.data.url
+      const url = res.data.data.url
 
       // 更新图片 URL
       imageUrl.value = url

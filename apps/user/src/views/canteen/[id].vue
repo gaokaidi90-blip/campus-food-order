@@ -6,6 +6,7 @@ import { getCanteenDetail, getDishes } from '@/api'
 import { showToast } from 'vant'
 import DishCard from '@/components/DishCard.vue'
 import { useCartStore } from '@/stores/cart'
+import { getCanteenImage } from '@/utils/canteenImage'
 
 const route = useRoute()
 const router = useRouter()
@@ -82,7 +83,7 @@ onMounted(() => {
 
       <template v-else-if="canteen">
         <div class="canteen-header">
-          <van-image :src="canteen.image" fit="cover" class="header-image" />
+          <van-image :src="getCanteenImage(canteen)" fit="cover" class="header-image" />
           <div class="header-info">
             <h2>{{ canteen.name }}</h2>
             <p>{{ canteen.description }}</p>

@@ -24,6 +24,56 @@ export const useAdminStore = defineStore('admin', () => {
   const canteenId = computed(() => adminInfo.value?.canteenId)
 
   /**
+   * Restore the admin identity used for UI permissions from the signed token.
+   * The backend remains the authority and validates the token on every API call.
+   */
+  function restoreFromToken() {
+    if (adminInfo.value) return
+
+    const token = getStorage<string>(ADMIN_TOKEN_KEY)
+    if (!token) return
+
+    try {
+      const payloadPart = token.split('.')[1]
+      if (!payloadPart) return
+
+      const base64 = payloadPart
+        .replace(/-/g, '+')
+        .replace(/_/g, '/')
+        .padEnd(Math.ceil(payloadPart.length / 4) * 4, '=')
+      const payload = JSON.parse(atob(base64)) as {
+        type?: string
+        adminId?: string
+        username?: string
+        role?: string
+        canteenId?: number | null
+      }
+
+      if (
+        payload.type !== 'admin' ||
+        !payload.adminId ||
+        !payload.username ||
+        (payload.role !== 'admin' && payload.role !== 'superadmin')
+      ) {
+        return
+      }
+
+      adminInfo.value = {
+        id: payload.adminId,
+        username: payload.username,
+        name: payload.username,
+        phone: '',
+        role: payload.role,
+        canteenId: payload.canteenId ?? null,
+        createdAt: '',
+        updatedAt: '',
+      }
+    } catch {
+      // Invalid tokens are rejected by protected backend endpoints.
+    }
+  }
+
+  /**
    * 登录
    * @param username 用户名
    * @param password 密码
@@ -59,6 +109,7 @@ export const useAdminStore = defineStore('admin', () => {
     adminInfo,
     isSuperAdmin,
     canteenId,
+    restoreFromToken,
     login,
     logout,
     isLoggedIn,

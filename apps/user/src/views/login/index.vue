@@ -109,9 +109,17 @@ async function handleAdminLogin() {
         && !route.query.returnTo.startsWith('//')
         ? route.query.returnTo
         : '/dashboard'
-      const targetUrl = `http://localhost:3001${returnTo}?token=${encodeURIComponent(token)}`
-      console.log('开始跳转到:', targetUrl)
-      window.location.href = targetUrl
+      const admin = data.data.admin
+      const targetUrl = new URL(returnTo, 'http://localhost:3001')
+      targetUrl.searchParams.set('token', token)
+      targetUrl.searchParams.set('adminRole', admin.role)
+      targetUrl.searchParams.set('adminId', admin.id)
+      targetUrl.searchParams.set('adminUsername', admin.username)
+      if (admin.canteenId !== null && admin.canteenId !== undefined) {
+        targetUrl.searchParams.set('canteenId', String(admin.canteenId))
+      }
+      console.log('开始跳转到:', targetUrl.toString())
+      window.location.href = targetUrl.toString()
     }, 500)
   } catch (error) {
     console.error('管理员登录失败:', error)

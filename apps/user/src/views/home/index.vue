@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import type { Canteen } from '@campus-food/shared'
 import { getCanteens } from '@/api'
 import { showToast } from 'vant'
+import { getCanteenImage } from '@/utils/canteenImage'
 
 const router = useRouter()
 const loading = ref(false)
@@ -32,13 +33,17 @@ onMounted(() => {
 
 <template>
   <div class="home-container">
-    <van-nav-bar title="校园点餐" fixed />
+    <van-nav-bar title="AI校园点餐" fixed>
+      <template #right>
+        <van-icon name="chat-o" size="20" @click="router.push('/ai-recommend')" />
+      </template>
+    </van-nav-bar>
 
     <div class="content">
       <van-pull-refresh v-model="loading" @refresh="fetchCanteens">
         <div class="canteen-list">
           <div v-for="canteen in canteens" :key="canteen.id" class="canteen-item" @click="handleCanteenClick(canteen)">
-            <van-image :src="canteen.image" fit="cover" class="canteen-image" />
+            <van-image :src="getCanteenImage(canteen)" fit="cover" class="canteen-image" />
             <div class="canteen-info">
               <div class="canteen-name">{{ canteen.name }}</div>
               <div class="canteen-desc">{{ canteen.description }}</div>

@@ -260,6 +260,8 @@ onMounted(() => {
               style="width: 60px; height: 60px"
               fit="cover"
               :preview-src-list="[row.image]"
+              :preview-teleported="true"
+              :z-index="4000"
             />
           </template>
         </el-table-column>
