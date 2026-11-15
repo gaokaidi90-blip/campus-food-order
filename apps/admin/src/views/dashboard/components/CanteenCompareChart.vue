@@ -26,6 +26,7 @@ const props = defineProps<{
 
 const chartRef = ref<HTMLDivElement>()
 let chartInstance: echarts.ECharts | null = null
+const handleResize = () => chartInstance?.resize()
 
 const isEmpty = computed(() => !props.data || props.data.length === 0)
 
@@ -111,17 +112,17 @@ watch(
   () => {
     initChart()
   },
-  { deep: true }
+  { deep: true, flush: 'post' }
 )
 
 onMounted(() => {
   initChart()
-  window.addEventListener('resize', () => chartInstance?.resize())
+  window.addEventListener('resize', handleResize)
 })
 
 onBeforeUnmount(() => {
   chartInstance?.dispose()
-  window.removeEventListener('resize', () => chartInstance?.resize())
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
