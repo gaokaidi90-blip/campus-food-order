@@ -110,7 +110,7 @@ async function handleAdminLogin() {
         ? route.query.returnTo
         : '/dashboard'
       const admin = data.data.admin
-      const targetUrl = new URL(returnTo, 'http://localhost:3001')
+      const targetUrl = new URL(returnTo, 'https://campus-food-order-admin.pages.dev')
       targetUrl.searchParams.set('token', token)
       targetUrl.searchParams.set('adminRole', admin.role)
       targetUrl.searchParams.set('adminId', admin.id)
@@ -175,31 +175,14 @@ onMounted(() => {
     <!-- 学生登录表单 -->
     <van-form v-if="loginType === 'user'" @submit="handleLogin">
       <van-cell-group inset>
-        <van-field
-          v-model="studentForm.studentId"
-          name="studentId"
-          label="学号"
-          placeholder="请输入学号"
-          :rules="[{ required: true, message: '请输入学号' }]"
-        />
-        <van-field
-          v-model="studentForm.password"
-          type="password"
-          name="password"
-          label="密码"
-          placeholder="请输入密码"
-          :rules="[{ required: true, message: '请输入密码' }]"
-        />
+        <van-field v-model="studentForm.studentId" name="studentId" label="学号" placeholder="请输入学号"
+          :rules="[{ required: true, message: '请输入学号' }]" />
+        <van-field v-model="studentForm.password" type="password" name="password" label="密码" placeholder="请输入密码"
+          :rules="[{ required: true, message: '请输入密码' }]" />
       </van-cell-group>
 
       <div class="login-button">
-        <van-button
-          round
-          block
-          type="primary"
-          native-type="submit"
-          :loading="loading"
-        >
+        <van-button round block type="primary" native-type="submit" :loading="loading">
           登录
         </van-button>
         <van-button round block plain @click="goToRegister" class="register-button">
@@ -216,31 +199,14 @@ onMounted(() => {
     <!-- 管理员登录表单 -->
     <van-form v-else @submit="handleLogin">
       <van-cell-group inset>
-        <van-field
-          v-model="adminForm.username"
-          name="username"
-          label="用户名"
-          placeholder="请输入用户名"
-          :rules="[{ required: true, message: '请输入用户名' }]"
-        />
-        <van-field
-          v-model="adminForm.password"
-          type="password"
-          name="password"
-          label="密码"
-          placeholder="请输入密码"
-          :rules="[{ required: true, message: '请输入密码' }]"
-        />
+        <van-field v-model="adminForm.username" name="username" label="用户名" placeholder="请输入用户名"
+          :rules="[{ required: true, message: '请输入用户名' }]" />
+        <van-field v-model="adminForm.password" type="password" name="password" label="密码" placeholder="请输入密码"
+          :rules="[{ required: true, message: '请输入密码' }]" />
       </van-cell-group>
 
       <div class="login-button">
-        <van-button
-          round
-          block
-          type="primary"
-          native-type="submit"
-          :loading="loading"
-        >
+        <van-button round block type="primary" native-type="submit" :loading="loading">
           登录
         </van-button>
       </div>

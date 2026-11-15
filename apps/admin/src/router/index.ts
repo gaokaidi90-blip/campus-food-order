@@ -12,7 +12,7 @@ const router = createRouter({
       // Keep the legacy URL working, but send it to the shared login app.
       component: () => import('@/views/dashboard/index.vue'),
       beforeEnter: (to) => {
-        const loginUrl = new URL('http://localhost:3000/login')
+        const loginUrl = new URL('https://campus-food-order.pages.dev/login')
         loginUrl.searchParams.set('redirect', 'admin')
         if (typeof to.query.returnTo === 'string') {
           loginUrl.searchParams.set('returnTo', to.query.returnTo)
@@ -121,7 +121,7 @@ router.beforeEach((to) => {
 
   // 需要登录但未登录，跳转到用户端统一登录页（管理员标签）
   if (requiresAuth && !token) {
-    const loginUrl = new URL('http://localhost:3000/login')
+    const loginUrl = new URL('https://campus-food-order.pages.dev/login')
     loginUrl.searchParams.set('redirect', 'admin')
     loginUrl.searchParams.set('returnTo', to.fullPath)
     window.location.href = loginUrl.toString()

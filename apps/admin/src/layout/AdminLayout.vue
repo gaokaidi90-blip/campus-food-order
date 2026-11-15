@@ -21,7 +21,7 @@ function toggleCollapse() {
  */
 function handleLogout() {
   adminStore.logout()
-  window.location.href = 'http://localhost:3000/login?redirect=admin'
+  window.location.href = 'https://campus-food-order.pages.dev/login?redirect=admin'
 }
 </script>
 
@@ -34,14 +34,8 @@ function handleLogout() {
         <span v-else>后台</span>
       </div>
 
-      <el-menu
-        :collapse="isCollapse"
-        :default-active="$route.path"
-        router
-        background-color="#304156"
-        text-color="#bfcbd9"
-        active-text-color="#409eff"
-      >
+      <el-menu :collapse="isCollapse" :default-active="$route.path" router background-color="#304156"
+        text-color="#bfcbd9" active-text-color="#409eff">
         <el-menu-item index="/dashboard">
           <el-icon><i-ep-odometer /></el-icon>
           <template #title>数据看板</template>
@@ -88,7 +82,7 @@ function handleLogout() {
         <div class="header-right">
           <el-dropdown @command="handleLogout">
             <span class="user-info">
-            <i-ep-user />
+              <i-ep-user />
               <span>{{ adminStore.adminInfo?.name || '管理员' }}</span>
             </span>
             <template #dropdown>

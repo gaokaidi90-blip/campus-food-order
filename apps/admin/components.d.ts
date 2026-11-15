@@ -38,7 +38,6 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTag: typeof import('element-plus/es')['ElTag']
-    ElText: typeof import('element-plus/es')['ElText']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     IEpCalendar: typeof import('~icons/ep/calendar')['default']
     IEpExpand: typeof import('~icons/ep/expand')['default']

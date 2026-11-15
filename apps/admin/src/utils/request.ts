@@ -12,7 +12,11 @@ import { ElMessage } from 'element-plus'
 const request: AxiosInstance = axios.create({
   // Use Vite's same-origin /api proxy in development to avoid backend CORS
   // allowlist mismatches between the user and admin app origins.
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL ||
+    (import.meta.env.PROD
+      ? 'https://campus-food-order-backend.gaokaidi90.workers.dev/api'
+      : '/api'),
   timeout: 10000, // 请求超时时间 10 秒
 })
 
@@ -109,3 +113,4 @@ export function del<T>(
 ): Promise<AxiosResponse<Res<T>>> {
   return request.delete<Res<T>>(url, config)
 }
+

@@ -11,6 +11,7 @@ import IconsResolver from 'unplugin-icons/resolver'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/',
   plugins: [
     vue(),
     vueDevTools(),
@@ -37,9 +38,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@campus-food/shared': fileURLToPath(
-        new URL('../../packages/shared/src', import.meta.url)
-      ),
+      '@campus-food/shared': fileURLToPath(new URL('../../packages/shared/src', import.meta.url)),
     },
   },
   server: {
