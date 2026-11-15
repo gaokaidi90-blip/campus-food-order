@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { getUserProfile, updateUserProfile, uploadImage } from '@/api'
+import { getUserProfile, updateUserProfile } from '@/api'
 import { showToast, showConfirmDialog } from 'vant'
 import type { User } from '@campus-food/shared'
 
@@ -88,19 +88,10 @@ async function handleSave() {
 
   loading.value = true
   try {
-    // 处理头像：如果有上传的文件，先上传到服务器
+    // 上传接口在 Cloudflare Worker 上目前不可用。先保存可编辑资料，保留原头像，
+    // 避免头像请求卡住后导致姓名等资料也无法保存。
     let avatarUrl = userInfo.value?.avatar || ''
-    if (editForm.value.avatar.length > 0) {
-      const file = editForm.value.avatar[0]
-      if (file.file) {
-        // 新上传的文件，上传到服务器
-        const formData = new FormData()
-        formData.append('file', file.file)
-
-        const uploadRes = await uploadImage(formData, 'avatar')
-        avatarUrl = uploadRes.data.data.url
-      }
-    }
+    const avatarChangePending = editForm.value.avatar.length > 0
 
     const { data } = await updateUserProfile({
       name: editForm.value.name,
@@ -108,7 +99,7 @@ async function handleSave() {
     })
     userInfo.value = data.data
     showEditDialog.value = false
-    showToast('保存成功')
+    showToast(avatarChangePending ? '资料已保存，头像暂未更换' : '保存成功')
   } catch (error) {
     showToast('保存失败')
   } finally {
