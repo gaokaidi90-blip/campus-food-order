@@ -192,7 +192,7 @@ onMounted(() => {
 
       <div class="login-tip">
         <p>测试账号：2021001</p>
-        <p>测试密码：password123</p>
+        <p>测试密码：123456</p>
       </div>
     </van-form>
 
@@ -212,8 +212,10 @@ onMounted(() => {
       </div>
 
       <div class="login-tip">
-        <p>测试账号：admin</p>
-        <p>测试密码：admin123</p>
+        <p>超级管理员账号：superadmin</p>
+        <p>密码：super123</p>
+        <p>一食堂管理账号：admin1</p>
+        <p>密码：admin123</p>
       </div>
     </van-form>
   </div>

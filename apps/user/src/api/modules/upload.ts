@@ -6,9 +6,6 @@ import { post } from '@/utils/request'
  * @param type 上传类型：avatar（默认）
  */
 export function uploadImage(formData: FormData, type: 'avatar' = 'avatar') {
-  return post<{ url: string }>(`/upload/${type}`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  })
+  // Let Axios set the multipart boundary for the browser FormData body.
+  return post<{ url: string }>(`/upload/${type}`, formData)
 }

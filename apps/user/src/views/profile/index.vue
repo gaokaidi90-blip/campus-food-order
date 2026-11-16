@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { getUserProfile, updateUserProfile } from '@/api'
+import { uploadImage } from '@/api/modules/upload'
 import { showToast, showConfirmDialog } from 'vant'
 import type { User } from '@campus-food/shared'
 
@@ -88,10 +89,14 @@ async function handleSave() {
 
   loading.value = true
   try {
-    // 上传接口在 Cloudflare Worker 上目前不可用。先保存可编辑资料，保留原头像，
-    // 避免头像请求卡住后导致姓名等资料也无法保存。
     let avatarUrl = userInfo.value?.avatar || ''
-    const avatarChangePending = editForm.value.avatar.length > 0
+    const selected = editForm.value.avatar[0]?.file
+    if (selected instanceof File) {
+      const formData = new FormData()
+      formData.append('file', selected)
+      const uploaded = await uploadImage(formData, 'avatar')
+      avatarUrl = uploaded.data.data.url
+    }
 
     const { data } = await updateUserProfile({
       name: editForm.value.name,
@@ -99,7 +104,7 @@ async function handleSave() {
     })
     userInfo.value = data.data
     showEditDialog.value = false
-    showToast(avatarChangePending ? '资料已保存，头像暂未更换' : '保存成功')
+    showToast('保存成功')
   } catch (error) {
     showToast('保存失败')
   } finally {
@@ -111,7 +116,7 @@ async function handleSave() {
  * 图片上传后的回调
  */
 function afterRead(file: any) {
-  // van-uploader 会自动处理文件，file.file 包含原始 File 对象
+  // van-uploader 提供的 file.file 会在保存资料时上传。
 }
 
 onMounted(() => {
