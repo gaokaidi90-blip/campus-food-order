@@ -104,7 +104,7 @@ function handleCancel() {
     </el-form-item>
 
     <el-form-item label="头像">
-      <ImageUpload v-model="form.avatar" />
+      <ImageUpload v-model="form.avatar" type="avatar" />
     </el-form-item>
 
     <el-form-item>
