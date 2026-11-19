@@ -167,11 +167,13 @@ onMounted(() => {
         </el-table-column>
         <el-table-column prop="name" label="食堂名称" width="200" />
         <el-table-column prop="description" label="描述" />
-        <el-table-column prop="location" label="位置" width="200" />
-        <el-table-column prop="businessHours" label="营业时间" width="200" />
+        <el-table-column prop="address" label="位置" width="200" />
+        <el-table-column label="营业时间" width="200">
+          <template #default="{ row }">{{ row.openTime }} - {{ row.closeTime }}</template>
+        </el-table-column>
         <el-table-column label="状态" width="100">
           <template #default="{ row }">
-            <el-tag v-if="row.status === 'open'" type="success">营业中</el-tag>
+            <el-tag v-if="Number(row.status) === 1" type="success">营业中</el-tag>
             <el-tag v-else type="info">已关闭</el-tag>
           </template>
         </el-table-column>

@@ -25,18 +25,21 @@ const loading = ref(false)
 const form = ref({
   name: '',
   description: '',
-  location: '',
-  businessHours: '',
+  address: '',
+  openTime: '',
+  closeTime: '',
   image: '',
-  status: 'open' as 'open' | 'closed',
+  // 数据库 canteens.status 是整数：1=营业，0=关闭
+  status: 1,
 })
 
 // 表单验证规则
 const rules: FormRules = {
   name: [{ required: true, message: '请输入食堂名称', trigger: 'blur' }],
   description: [{ required: true, message: '请输入描述', trigger: 'blur' }],
-  location: [{ required: true, message: '请输入位置', trigger: 'blur' }],
-  businessHours: [{ required: true, message: '请输入营业时间', trigger: 'blur' }],
+  address: [{ required: true, message: '请输入位置', trigger: 'blur' }],
+  openTime: [{ required: true, message: '请输入开始营业时间', trigger: 'blur' }],
+  closeTime: [{ required: true, message: '请输入结束营业时间', trigger: 'blur' }],
   image: [{ required: true, message: '请上传食堂图片', trigger: 'change' }],
 }
 
@@ -50,10 +53,11 @@ watch(
       form.value = {
         name: newVal.name,
         description: newVal.description,
-        location: newVal.location,
-        businessHours: newVal.businessHours,
+        address: newVal.address,
+        openTime: newVal.openTime,
+        closeTime: newVal.closeTime,
         image: newVal.image,
-        status: newVal.status,
+        status: Number(newVal.status) === 0 ? 0 : 1,
       }
     } else {
       // 新增时重置表单
@@ -117,12 +121,16 @@ function handleCancel() {
       />
     </el-form-item>
 
-    <el-form-item label="位置" prop="location">
-      <el-input v-model="form.location" placeholder="请输入位置" />
+    <el-form-item label="位置" prop="address">
+      <el-input v-model="form.address" placeholder="请输入位置" />
     </el-form-item>
 
-    <el-form-item label="营业时间" prop="businessHours">
-      <el-input v-model="form.businessHours" placeholder="例如：07:00 - 20:00" />
+    <el-form-item label="开始营业" prop="openTime">
+      <el-input v-model="form.openTime" placeholder="例如：07:00" />
+    </el-form-item>
+
+    <el-form-item label="结束营业" prop="closeTime">
+      <el-input v-model="form.closeTime" placeholder="例如：20:00" />
     </el-form-item>
 
     <el-form-item label="食堂图片" prop="image">
@@ -131,8 +139,8 @@ function handleCancel() {
 
     <el-form-item label="状态" prop="status">
       <el-radio-group v-model="form.status">
-        <el-radio value="open">营业中</el-radio>
-        <el-radio value="closed">已关闭</el-radio>
+        <el-radio :value="1">营业中</el-radio>
+        <el-radio :value="0">已关闭</el-radio>
       </el-radio-group>
     </el-form-item>
 
