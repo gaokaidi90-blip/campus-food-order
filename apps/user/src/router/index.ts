@@ -77,6 +77,12 @@ const routes = [
       meta: { requiresAuth: true },
     },
     {
+      path: '/ai-recommend',
+      name: 'ai-recommend',
+      component: () => import('@/views/ai-recommend/index.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/404.vue'),
