@@ -6,5 +6,6 @@ export * from './modules/address'
 export * from './modules/order'
 export * from './modules/profile'
 export * from './modules/upload'
+export * from './modules/ai'
 
 
