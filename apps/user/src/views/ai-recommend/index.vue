@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import type { Dish } from '@campus-food/shared'
+import type { Dish, AICriteria } from '@campus-food/shared'
 import { getAIRecommendation } from '@/api'
 import DishCard from '@/components/DishCard.vue'
 
@@ -11,6 +11,8 @@ const query = ref('')
 const loading = ref(false)
 const searched = ref(false)
 const dishes = ref<Dish[]>([])
+const criteria = ref<AICriteria | null>(null)
+const showThinking = ref(false)
 
 async function handleSearch() {
   const trimmedQuery = query.value.trim()
@@ -27,10 +29,17 @@ async function handleSearch() {
 
   loading.value = true
   searched.value = true
+  showThinking.value = true
+  criteria.value = null
 
   try {
     const { data } = await getAIRecommendation(trimmedQuery)
-    dishes.value = data.data
+    criteria.value = data.data.criteria
+
+    // 延迟展示结果，让用户看到思考过程
+    await new Promise(resolve => setTimeout(resolve, 800))
+
+    dishes.value = data.data.dishes
 
     if (dishes.value.length === 0) {
       showToast('没有找到符合条件的菜品')
@@ -39,8 +48,10 @@ async function handleSearch() {
     console.error('AI 推荐失败:', error)
     showToast('推荐失败，请稍后重试')
     dishes.value = []
+    criteria.value = null
   } finally {
     loading.value = false
+    showThinking.value = false
   }
 }
 
@@ -51,6 +62,16 @@ function handleDishClick(dish: Dish) {
 function handleQuickTag(text: string) {
   query.value = text
   handleSearch()
+}
+
+// 格式化辣度
+function formatSpicy(spicy?: string) {
+  const map = {
+    no: '不辣',
+    light: '微辣/中辣',
+    any: '可以辣'
+  }
+  return spicy && spicy in map ? map[spicy as keyof typeof map] : '无要求'
 }
 </script>
 
@@ -90,11 +111,50 @@ function handleQuickTag(text: string) {
         <van-loading size="24px">AI 正在为您推荐...</van-loading>
       </div>
 
+      <!-- AI 思考过程 -->
+      <div v-if="criteria && !loading" class="thinking-process">
+        <div class="thinking-header">
+          <van-icon name="bulb-o" color="#ff976a" />
+          <span>AI 分析结果</span>
+        </div>
+
+        <div class="thinking-items">
+          <div v-if="criteria.maxPrice" class="thinking-item">
+            <van-icon name="balance-o" color="#07c160" />
+            <span class="label">预算：</span>
+            <span class="value">{{ criteria.maxPrice }} 元以内</span>
+          </div>
+
+          <div v-if="criteria.keywords && criteria.keywords.length > 0" class="thinking-item">
+            <van-icon name="search" color="#1989fa" />
+            <span class="label">关键词：</span>
+            <span class="value">{{ criteria.keywords.join('、') }}</span>
+          </div>
+
+          <div v-if="criteria.spicy && criteria.spicy !== 'any'" class="thinking-item">
+            <van-icon name="fire-o" color="#ee0a24" />
+            <span class="label">辣度：</span>
+            <span class="value">{{ formatSpicy(criteria.spicy) }}</span>
+          </div>
+
+          <div v-if="criteria.taste && criteria.taste.length > 0" class="thinking-item">
+            <van-icon name="good-job-o" color="#ff976a" />
+            <span class="label">口味：</span>
+            <span class="value">{{ criteria.taste.join('、') }}</span>
+          </div>
+        </div>
+
+        <div class="thinking-result">
+          <van-icon name="checked" color="#07c160" />
+          找到 {{ dishes.length }} 个符合条件的菜品
+        </div>
+      </div>
+
       <!-- 结果展示 -->
-      <div v-else-if="dishes.length > 0" class="result-list">
+      <div v-if="!loading && dishes.length > 0" class="result-list">
         <div class="result-header">
           <van-icon name="star-o" />
-          找到 {{ dishes.length }} 个菜品
+          推荐菜品
         </div>
         <DishCard
           v-for="dish in dishes"
@@ -156,6 +216,90 @@ function handleQuickTag(text: string) {
   justify-content: center;
   align-items: center;
   padding: 80px 0;
+}
+
+.thinking-process {
+  background: #fff;
+  margin: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.thinking-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #323233;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ebedf0;
+
+  .van-icon {
+    font-size: 18px;
+  }
+}
+
+.thinking-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.thinking-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  padding: 8px 12px;
+  background: #f7f8fa;
+  border-radius: 8px;
+
+  .van-icon {
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+
+  .label {
+    color: #646566;
+    font-weight: 500;
+  }
+
+  .value {
+    color: #323233;
+  }
+}
+
+.thinking-result {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #07c160;
+
+  .van-icon {
+    font-size: 16px;
+  }
 }
 
 .result-list {

@@ -12,3 +12,4 @@ export type {
   AdminLoginRes,
   DashboardStats,
 } from './admin'
+export type { AICriteria, AIRecommendRes } from './ai'
