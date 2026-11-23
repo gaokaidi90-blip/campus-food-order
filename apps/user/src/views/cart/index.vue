@@ -5,6 +5,7 @@ import { useCartStore } from '@/stores/cart'
 import { useCart } from '@/composables/useCart'
 import { useOrder } from '@/composables/useOrder'
 import { showToast, showConfirmDialog } from 'vant'
+import { getNutritionAnalysis } from '@/api'
 
 const router = useRouter()
 const cartStore = useCartStore()
@@ -13,6 +14,9 @@ const { createOrder } = useOrder()
 
 const loading = ref(false)
 const checkedIds = ref<string[]>([])
+const showNutritionDialog = ref(false)
+const nutritionLoading = ref(false)
+const nutritionData = ref<any>(null)
 
 /**
  * 计算选中的商品总价
@@ -116,6 +120,36 @@ async function handleCheckout() {
   })
 }
 
+/**
+ * 营养分析
+ */
+async function handleNutritionAnalysis() {
+  if (cartStore.cartItems.length === 0) {
+    showToast('购物车是空的')
+    return
+  }
+
+  showNutritionDialog.value = true
+  nutritionLoading.value = true
+  nutritionData.value = null
+
+  try {
+    const dishes = cartStore.cartItems.map((item) => ({
+      name: item.dish?.name || '',
+      price: item.dish?.price || 0,
+      quantity: item.quantity
+    }))
+
+    const { data } = await getNutritionAnalysis(dishes)
+    nutritionData.value = data.data
+  } catch (error) {
+    showToast('分析失败，请稍后重试')
+    showNutritionDialog.value = false
+  } finally {
+    nutritionLoading.value = false
+  }
+}
+
 onMounted(() => {
   fetchCart()
 })
@@ -165,6 +199,73 @@ onMounted(() => {
         <van-empty v-if="!loading && cartStore.cartItems.length === 0" description="购物车是空的" />
       </van-pull-refresh>
     </div>
+
+    <!-- 营养分析悬浮按钮 -->
+    <van-floating-bubble
+      v-if="cartStore.cartItems.length > 0"
+      icon="bar-chart-o"
+      @click="handleNutritionAnalysis"
+      :style="{ bottom: '120px', right: '20px' }"
+    />
+
+    <!-- 营养分析弹窗 -->
+    <van-dialog
+      v-model:show="showNutritionDialog"
+      title="营养分析"
+      :show-confirm-button="false"
+      close-on-click-overlay
+    >
+      <div v-if="nutritionLoading" class="nutrition-loading">
+        <van-loading size="24px">AI 正在分析...</van-loading>
+      </div>
+      <div v-else-if="nutritionData" class="nutrition-content">
+        <div class="nutrition-summary">
+          {{ nutritionData.summary }}
+        </div>
+
+        <div class="nutrition-details">
+          <div class="detail-item">
+            <van-icon name="fire" color="#ff976a" />
+            <span class="label">热量：</span>
+            <span class="value">{{ nutritionData.details.calories }}</span>
+          </div>
+          <div class="detail-item">
+            <van-icon name="underway" color="#07c160" />
+            <span class="label">蛋白质：</span>
+            <span class="value">{{ nutritionData.details.protein }}</span>
+          </div>
+          <div class="detail-item">
+            <van-icon name="food" color="#1989fa" />
+            <span class="label">碳水：</span>
+            <span class="value">{{ nutritionData.details.carbs }}</span>
+          </div>
+          <div class="detail-item">
+            <van-icon name="hot" color="#ee0a24" />
+            <span class="label">脂肪：</span>
+            <span class="value">{{ nutritionData.details.fat }}</span>
+          </div>
+          <div class="detail-item">
+            <van-icon name="tosend" color="#ff976a" />
+            <span class="label">膳食纤维：</span>
+            <span class="value">{{ nutritionData.details.fiber }}</span>
+          </div>
+        </div>
+
+        <div v-if="nutritionData.suggestions?.length > 0" class="nutrition-suggestions">
+          <div class="suggestions-title">
+            <van-icon name="bulb-o" />
+            健康建议
+          </div>
+          <div
+            v-for="(suggestion, index) in nutritionData.suggestions"
+            :key="index"
+            class="suggestion-item"
+          >
+            {{ suggestion }}
+          </div>
+        </div>
+      </div>
+    </van-dialog>
 
     <van-submit-bar
       :price="checkedTotalPrice * 100"
@@ -246,5 +347,88 @@ onMounted(() => {
 
 .delete-button {
   height: 100%;
+}
+
+.nutrition-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.nutrition-content {
+  padding: 16px;
+}
+
+.nutrition-summary {
+  font-size: 15px;
+  color: #323233;
+  line-height: 24px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f0f9ff;
+  border-radius: 8px;
+}
+
+.nutrition-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  padding: 8px 12px;
+  background: #f7f8fa;
+  border-radius: 8px;
+
+  .van-icon {
+    font-size: 18px;
+    margin-right: 8px;
+  }
+
+  .label {
+    color: #646566;
+    font-weight: 500;
+  }
+
+  .value {
+    color: #323233;
+    margin-left: 4px;
+  }
+}
+
+.nutrition-suggestions {
+  padding-top: 16px;
+  border-top: 1px solid #ebedf0;
+}
+
+.suggestions-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #323233;
+  margin-bottom: 12px;
+
+  .van-icon {
+    color: #ff976a;
+    font-size: 18px;
+  }
+}
+
+.suggestion-item {
+  font-size: 14px;
+  color: #646566;
+  line-height: 24px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: #fff7f0;
+  border-radius: 8px;
+  border-left: 3px solid #ff976a;
 }
 </style>
