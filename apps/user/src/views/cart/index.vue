@@ -18,6 +18,12 @@ const showNutritionDialog = ref(false)
 const nutritionLoading = ref(false)
 const nutritionData = ref<any>(null)
 
+// 悬浮按钮位置（从 localStorage 恢复）
+const bubbleAxis = ref({
+  x: Number(localStorage.getItem('nutrition_bubble_x')) || window.innerWidth - 60,
+  y: Number(localStorage.getItem('nutrition_bubble_y')) || window.innerHeight - 170
+})
+
 /**
  * 计算选中的商品总价
  */
@@ -150,6 +156,15 @@ async function handleNutritionAnalysis() {
   }
 }
 
+/**
+ * 保存悬浮按钮位置
+ */
+function handleBubbleOffsetChange(x: number, y: number) {
+  bubbleAxis.value = { x, y }
+  localStorage.setItem('nutrition_bubble_x', String(x))
+  localStorage.setItem('nutrition_bubble_y', String(y))
+}
+
 onMounted(() => {
   fetchCart()
 })
@@ -205,7 +220,8 @@ onMounted(() => {
       v-if="cartStore.cartItems.length > 0"
       icon="bar-chart-o"
       @click="handleNutritionAnalysis"
-      :style="{ bottom: '120px', right: '20px' }"
+      v-model:offset="bubbleAxis"
+      @offset-change="handleBubbleOffsetChange"
     />
 
     <!-- 营养分析弹窗 -->

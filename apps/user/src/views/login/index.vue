@@ -59,6 +59,11 @@ async function handleUserLogin() {
   loading.value = true
   try {
     await login(studentForm.value.studentId, studentForm.value.password)
+
+    // 清除悬浮按钮位置缓存
+    localStorage.removeItem('nutrition_bubble_x')
+    localStorage.removeItem('nutrition_bubble_y')
+
     showToast('登录成功')
     router.push('/')
   } catch (error) {
@@ -93,6 +98,10 @@ async function handleAdminLogin() {
     console.log('管理员登录成功，token:', data.data.token)
 
     const token = data.data.token
+
+    // 清除悬浮按钮位置缓存
+    localStorage.removeItem('nutrition_bubble_x')
+    localStorage.removeItem('nutrition_bubble_y')
 
     // 保存管理员 token 到当前域（用户端）
     setStorage(ADMIN_TOKEN_KEY, token)
