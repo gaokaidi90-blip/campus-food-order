@@ -165,7 +165,7 @@ function formatSpicy(spicy?: string) {
       </div>
 
       <!-- 空状态 -->
-      <van-empty v-else-if="searched" description="没有找到合适的菜品，试试换个说法吧" />
+      <van-empty v-else-if="searched && !loading && dishes.length === 0" description="没有找到合适的菜品，试试换个说法吧" />
 
       <!-- 初始状态提示 -->
       <div v-else class="tips">
