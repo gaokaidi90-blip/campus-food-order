@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import type { Dish, AICriteria } from '@campus-food/shared'
@@ -13,6 +13,15 @@ const searched = ref(false)
 const dishes = ref<Dish[]>([])
 const criteria = ref<AICriteria | null>(null)
 const showThinking = ref(false)
+
+// 监听输入框变化，清空时重置状态
+watch(query, (newVal) => {
+  if (!newVal.trim()) {
+    searched.value = false
+    dishes.value = []
+    criteria.value = null
+  }
+})
 
 async function handleSearch() {
   const trimmedQuery = query.value.trim()
@@ -168,7 +177,7 @@ function formatSpicy(spicy?: string) {
       <van-empty v-else-if="searched && !loading && dishes.length === 0" description="没有找到合适的菜品，试试换个说法吧" />
 
       <!-- 初始状态提示 -->
-      <div v-else class="tips">
+      <div v-else-if="!loading" class="tips">
         <div class="tips-title">💡 试试这样说</div>
         <div class="tips-item">• 推荐 20 元以内、不辣的菜</div>
         <div class="tips-item">• 想吃清淡的</div>
