@@ -16,7 +16,8 @@
       "Bash(findstr \"LISTENING\")",
       "Bash(xargs grep:*)",
       "Bash(find F:\\\\xydc\\\\campus-food-order\\\\apps\\\\admin:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(awk '{print $5}')"
     ]
   }
 }
