@@ -41,10 +41,26 @@ async function fetchOrderDetail() {
 
 /**
  * 格式化日期时间
+ * 确保显示本地时间（北京时间）
  */
 function formatDateTime(dateStr: string) {
+  // 如果后端返回的是 UTC 时间（如 "2026-11-24T09:17:35.000Z"），
+  // new Date() 会自动转换为本地时间
   const date = new Date(dateStr)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+
+  // 检查日期是否有效
+  if (isNaN(date.getTime())) {
+    return dateStr
+  }
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`
 }
 
 /**
