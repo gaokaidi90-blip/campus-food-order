@@ -41,6 +41,30 @@ onMounted(() => {
 
     <div class="content">
       <van-pull-refresh v-model="loading" @refresh="fetchCanteens">
+        <!-- AI 推荐入口 -->
+        <div class="ai-features">
+          <div class="feature-card" @click="router.push('/personalized')">
+            <div class="feature-icon">
+              <van-icon name="fire" color="#ff976a" size="24" />
+            </div>
+            <div class="feature-content">
+              <div class="feature-title">为你推荐</div>
+              <div class="feature-desc">基于你的喜好智能推荐</div>
+            </div>
+            <van-icon name="arrow" class="feature-arrow" />
+          </div>
+          <div class="feature-card" @click="router.push('/ai-recommend')">
+            <div class="feature-icon">
+              <van-icon name="chat-o" color="#1989fa" size="24" />
+            </div>
+            <div class="feature-content">
+              <div class="feature-title">AI 找餐</div>
+              <div class="feature-desc">告诉 AI 你想吃什么</div>
+            </div>
+            <van-icon name="arrow" class="feature-arrow" />
+          </div>
+        </div>
+
         <div class="canteen-list">
           <div v-for="canteen in canteens" :key="canteen.id" class="canteen-item" @click="handleCanteenClick(canteen)">
             <van-image :src="getCanteenImage(canteen)" fit="cover" class="canteen-image" />
@@ -79,6 +103,69 @@ onMounted(() => {
   padding-top: 46px;
   padding-bottom: 50px;
   min-height: 100vh;
+}
+
+.ai-features {
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.feature-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #f7f8fa;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.feature-content {
+  flex: 1;
+  margin-left: 10px;
+  overflow: hidden;
+}
+
+.feature-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #323233;
+  margin-bottom: 2px;
+}
+
+.feature-desc {
+  font-size: 12px;
+  color: #969799;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feature-arrow {
+  flex-shrink: 0;
+  margin-left: 8px;
+  color: #c8c9cc;
+  font-size: 14px;
 }
 
 .canteen-list {

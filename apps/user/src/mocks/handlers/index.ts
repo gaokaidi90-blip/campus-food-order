@@ -11,18 +11,17 @@ import {
   saveOrders,
   saveCarts,
   saveAddresses,
-} from '@campus-food/shared/mocks/data'
+} from '@campus-food/shared'
+import { aiHandlers } from './ai'
 
 export const handlers = [
+  ...aiHandlers,
   // 获取食堂列表
   http.get('/api/canteens', () => {
-    return HttpResponse.json<PageRes<any>>({
+    return HttpResponse.json<Res<any[]>>({
       code: 200,
       message: 'success',
-      data: {
-        items: canteens,
-        total: canteens.length,
-      },
+      data: canteens,
     })
   }),
 
@@ -33,7 +32,7 @@ export const handlers = [
 
     let filtered = categories
     if (canteenId) {
-      filtered = categories.filter((c) => c.canteenId === canteenId)
+      filtered = categories.filter((c: any) => c.canteenId === canteenId)
     }
 
     return HttpResponse.json<Res<any[]>>({
@@ -49,28 +48,25 @@ export const handlers = [
     const canteenId = url.searchParams.get('canteenId')
     const categoryId = url.searchParams.get('categoryId')
 
-    let filtered = dishes.filter((d) => d.status === 'available')
+    let filtered = dishes.filter((d: any) => d.status === 'available')
 
     if (canteenId) {
-      filtered = filtered.filter((d) => d.canteenId === canteenId)
+      filtered = filtered.filter((d: any) => d.canteenId === canteenId)
     }
     if (categoryId) {
-      filtered = filtered.filter((d) => d.categoryId === categoryId)
+      filtered = filtered.filter((d: any) => d.categoryId === categoryId)
     }
 
-    return HttpResponse.json<PageRes<any>>({
+    return HttpResponse.json<Res<any[]>>({
       code: 200,
       message: 'success',
-      data: {
-        items: filtered,
-        total: filtered.length,
-      },
+      data: filtered,
     })
   }),
 
   // 获取菜品详情
   http.get('/api/dishes/:id', ({ params }) => {
-    const dish = dishes.find((d) => d.id === params.id)
+    const dish = dishes.find((d: any) => d.id === params.id)
     if (!dish) {
       return HttpResponse.json<Res<null>>(
         { code: 404, message: '菜品不存在', data: null },
@@ -87,7 +83,7 @@ export const handlers = [
 
   // 获取购物车
   http.get('/api/cart', ({ request }) => {
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '') || ''
     if (!token) {
       return HttpResponse.json<Res<null>>(
         { code: 401, message: '未登录', data: null },
@@ -95,7 +91,7 @@ export const handlers = [
       )
     }
 
-    const userCarts = carts.filter((c) => c.userId === token)
+    const userCarts = carts.filter((c: any) => c.userId === token)
 
     return HttpResponse.json<Res<any[]>>({
       code: 200,
@@ -106,7 +102,7 @@ export const handlers = [
 
   // 添加到购物车
   http.post('/api/cart', async ({ request }) => {
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '') || ''
     if (!token) {
       return HttpResponse.json<Res<null>>(
         { code: 401, message: '未登录', data: null },
@@ -117,13 +113,13 @@ export const handlers = [
     const body = (await request.json()) as any
 
     const existingCart = carts.find(
-      (c) => c.userId === token && c.dishId === body.dishId
+      (c: any) => c.userId === token && c.dishId === body.dishId
     )
 
     if (existingCart) {
       existingCart.quantity += body.quantity || 1
     } else {
-      const dish = dishes.find((d) => d.id === body.dishId)
+      const dish = dishes.find((d: any) => d.id === body.dishId)
       if (!dish) {
         return HttpResponse.json<Res<null>>(
           { code: 404, message: '菜品不存在', data: null },
@@ -135,11 +131,11 @@ export const handlers = [
         id: String(Date.now()),
         userId: token,
         dishId: body.dishId,
-        dishName: dish.name,
-        dishImage: dish.image,
-        price: dish.price,
+        dishName: (dish as any).name,
+        dishImage: (dish as any).image,
+        price: (dish as any).price,
         quantity: body.quantity || 1,
-        canteenId: dish.canteenId,
+        canteenId: (dish as any).canteenId,
       })
     }
 
@@ -154,7 +150,7 @@ export const handlers = [
 
   // 更新购物车
   http.put('/api/cart/:id', async ({ request, params }) => {
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '') || ''
     if (!token) {
       return HttpResponse.json<Res<null>>(
         { code: 401, message: '未登录', data: null },
@@ -164,7 +160,7 @@ export const handlers = [
 
     const body = (await request.json()) as any
     const cartIndex = carts.findIndex(
-      (c) => c.id === params.id && c.userId === token
+      (c: any) => c.id === params.id && c.userId === token
     )
 
     if (cartIndex === -1) {
@@ -187,7 +183,7 @@ export const handlers = [
 
   // 删除购物车项
   http.delete('/api/cart/:id', ({ request, params }) => {
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '') || ''
     if (!token) {
       return HttpResponse.json<Res<null>>(
         { code: 401, message: '未登录', data: null },
@@ -196,7 +192,7 @@ export const handlers = [
     }
 
     const cartIndex = carts.findIndex(
-      (c) => c.id === params.id && c.userId === token
+      (c: any) => c.id === params.id && c.userId === token
     )
 
     if (cartIndex === -1) {
@@ -218,7 +214,7 @@ export const handlers = [
 
   // 获取订单列表
   http.get('/api/orders', ({ request }) => {
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('Authorization')?.replace('Bearer ', '') || ''
     if (!token) {
       return HttpResponse.json<Res<null>>(
         { code: 401, message: '未登录', data: null },
@@ -227,16 +223,13 @@ export const handlers = [
     }
 
     const userOrders = orders
-      .filter((o) => o.userId === token)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .filter((o: any) => o.userId === token)
+      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
-    return HttpResponse.json<PageRes<any>>({
+    return HttpResponse.json<Res<any[]>>({
       code: 200,
       message: 'success',
-      data: {
-        items: userOrders,
-        total: userOrders.length,
-      },
+      data: userOrders,
     })
   }),
 
