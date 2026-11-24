@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import { useCart } from '@/composables/useCart'
@@ -23,6 +23,38 @@ const bubbleAxis = ref({
   x: Number(localStorage.getItem('nutrition_bubble_x')) || window.innerWidth - 60,
   y: Number(localStorage.getItem('nutrition_bubble_y')) || window.innerHeight - 170
 })
+
+/**
+ * 保存选中状态到 localStorage
+ */
+function saveCheckedIds() {
+  localStorage.setItem('cart_checked_ids', JSON.stringify(checkedIds.value))
+}
+
+/**
+ * 从 localStorage 恢复选中状态
+ */
+function restoreCheckedIds() {
+  try {
+    const saved = localStorage.getItem('cart_checked_ids')
+    if (saved) {
+      const savedIds = JSON.parse(saved) as string[]
+      // 只恢复当前购物车中存在的商品
+      checkedIds.value = savedIds.filter(id =>
+        cartStore.cartItems.some(item => item.id === id)
+      )
+    }
+  } catch (error) {
+    console.error('恢复选中状态失败:', error)
+  }
+}
+
+/**
+ * 监听选中状态变化，自动保存
+ */
+watch(checkedIds, () => {
+  saveCheckedIds()
+}, { deep: true })
 
 /**
  * 计算选中的商品总价
@@ -69,6 +101,8 @@ async function fetchCart() {
   loading.value = true
   try {
     await cartStore.fetchCart()
+    // 恢复选中状态
+    restoreCheckedIds()
   } catch (error) {
     showToast('加载失败')
   } finally {
