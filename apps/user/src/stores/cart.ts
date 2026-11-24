@@ -54,23 +54,7 @@ export const useCartStore = defineStore('cart', () => {
    * @param quantity 新数量
    */
   async function updateCartItem(id: string, quantity: number) {
-    // 乐观更新：先立即更新本地状态，给用户即时反馈
-    const item = cartItems.value.find(item => item.id === id)
-    if (item) {
-      const oldQuantity = item.quantity
-      item.quantity = quantity
-
-      try {
-        // 后台更新
-        await updateCart(id, { quantity })
-        // 重新获取购物车数据以确保同步
-        await fetchCart()
-      } catch (error) {
-        // 如果失败，恢复原来的数量
-        item.quantity = oldQuantity
-        throw error
-      }
-    }
+    await updateCart(id, { quantity })
   }
 
   /**

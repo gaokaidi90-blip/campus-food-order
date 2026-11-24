@@ -111,10 +111,35 @@ async function fetchCart() {
 }
 
 /**
- * 更新数量
+ * 更新数量（带防抖）
  */
-async function handleQuantityChange(id: string, quantity: number) {
-  await updateCartItem(id, quantity)
+const updateTimers = new Map<string, number>()
+
+function handleQuantityChange(id: string, quantity: number) {
+  // 立即更新本地状态（乐观更新）
+  const item = cartStore.cartItems.find(item => item.id === id)
+  if (item) {
+    item.quantity = quantity
+  }
+
+  // 清除之前的定时器
+  const existingTimer = updateTimers.get(id)
+  if (existingTimer) {
+    clearTimeout(existingTimer)
+  }
+
+  // 500ms 后再发送请求到后端（防抖）
+  const timer = window.setTimeout(async () => {
+    try {
+      await updateCartItem(id, quantity)
+      updateTimers.delete(id)
+    } catch (error) {
+      // 更新失败，重新获取购物车
+      await fetchCart()
+    }
+  }, 500)
+
+  updateTimers.set(id, timer)
 }
 
 /**
