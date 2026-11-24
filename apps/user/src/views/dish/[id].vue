@@ -44,21 +44,47 @@ async function handleAddToCart() {
 async function handleBuyNow() {
   if (!dish.value) return
 
-  // 先加入购物车（不显示提示）
-  const success = await addToCart(dish.value.id, dish.value.canteenId, quantity.value, false)
-  if (success) {
-    // 获取刚添加的购物车项ID，跳转到结算页面
-    const { useCartStore } = await import('@/stores/cart')
-    const cartStore = useCartStore()
-    const cartItem = cartStore.cartItems.find(item => item.dishId === dish.value!.id)
+  const { useCartStore } = await import('@/stores/cart')
+  const cartStore = useCartStore()
 
-    if (cartItem) {
+  // 检查购物车中是否已有该商品
+  const existingItem = cartStore.cartItems.find(item => item.dishId === dish.value!.id)
+
+  if (existingItem) {
+    // 如果已存在，先保存原数量，然后临时设置为用户选择的数量
+    const originalQuantity = existingItem.quantity
+
+    try {
+      // 更新为用户选择的数量
+      await cartStore.updateCartItem(existingItem.id, quantity.value)
+
+      // 跳转到结算页
       router.push({
         path: '/checkout',
         query: {
-          items: cartItem.id,
+          items: existingItem.id,
+          from: 'buyNow', // 标记来自立即购买
         },
       })
+    } catch (error) {
+      showToast('操作失败')
+    }
+  } else {
+    // 不存在则添加到购物车
+    const success = await addToCart(dish.value.id, dish.value.canteenId, quantity.value, false)
+    if (success) {
+      await cartStore.fetchCart()
+      const cartItem = cartStore.cartItems.find(item => item.dishId === dish.value!.id)
+
+      if (cartItem) {
+        router.push({
+          path: '/checkout',
+          query: {
+            items: cartItem.id,
+            from: 'buyNow',
+          },
+        })
+      }
     }
   }
 }
