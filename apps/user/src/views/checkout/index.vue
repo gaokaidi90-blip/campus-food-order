@@ -12,7 +12,7 @@ const router = useRouter()
 const cartStore = useCartStore()
 const { createOrder } = useOrder()
 
-const loading = ref(false)
+const loading = ref(true)
 const addresses = ref<Address[]>([])
 const selectedAddressId = ref('')
 const remark = ref('')
@@ -100,9 +100,14 @@ async function handleSubmit() {
   loading.value = false
 }
 
-onMounted(() => {
-  cartStore.fetchCart()
-  fetchAddresses()
+onMounted(async () => {
+  loading.value = true
+  try {
+    await cartStore.fetchCart()
+    await fetchAddresses()
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
